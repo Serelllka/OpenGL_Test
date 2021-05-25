@@ -1,5 +1,8 @@
 #include"visualizer.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 unsigned int texture;
 
 void draw_line(float x1, float y1, float z1, float x2, float y2, float z2)
@@ -87,7 +90,7 @@ void draw_block(block& blk, float x, float y, float z)
                        1,0,0, 1,1,0, 1,1,1, 1,0,1,  //FRONT
                        0,0,0, 0,1,0, 0,1,1, 0,0,1}; //BACK
 
-   float texCoord[] = {0,0, 0,1, 1,1, 1,0};
+    float texCoord[] = {0,0, 0,1, 1,1, 1,0};
 
     for (int i = 0; i < 24; ++i)
     {
@@ -101,10 +104,11 @@ void draw_block(block& blk, float x, float y, float z)
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-    //set_color(blk[rc_types::UPP]);
+    set_color(blk[rc_types::UPP]);
     glVertexPointer(3, GL_FLOAT, 0, &upp);
     glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    //glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
     set_color(blk[rc_types::DWN]);
     glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
@@ -124,6 +128,7 @@ void draw_block(block& blk, float x, float y, float z)
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
     draw_blocks_grid(blk, x, y, z);
 
     x = -x; y = -y; z = -z;
@@ -248,7 +253,7 @@ bool rotate_visualization(lay_manager& manager, std::string cmd)
 void texture_initialization()
 {
     int width, height, cnt;
-    unsigned char *data = stbi_load("../textures/zero_two.jpg", &width, &height, &cnt, 0);
+    unsigned char *data = stbi_load("../textures/rem.png", &width, &height, &cnt, 0);
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);

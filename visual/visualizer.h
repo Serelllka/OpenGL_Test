@@ -2,8 +2,6 @@
 #include "../cube_logic/lay_manager.h"
 #include <GL/gl.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 void draw_line(float, float, float, float, float, float);
 

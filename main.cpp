@@ -137,6 +137,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     camera cam(0,0,1.7, 0,0);
     player gamer(cam);
+    texture_initialization();
 
     /* program main loop */
     while (!bQuit)
