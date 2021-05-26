@@ -9,6 +9,8 @@
 #include "visual/player.h"
 #include "config/parser.h"
 
+float near_val, far_val;
+
 void ShowWorld()
 {
     float tile[] = {0,0,0, 0,1,0, 1,1,0, 1,0,0};
@@ -40,6 +42,24 @@ int WINAPI WinMain(HINSTANCE hInstance,
                    LPSTR lpCmdLine,
                    int nCmdShow)
 {
+    visualizer visual;
+    parser prs("../config/config.cfg");
+    float tick_speed, cube_rotation_angle, cube_rotation_speed;
+    prs.read_param(tick_speed, "tick_speed");
+    prs.read_param(cube_rotation_angle, "tick_speed");
+    prs.read_param(cube_rotation_speed, "cube_rotation_speed");
+    prs.read_param(near_val, "near_value");
+    prs.read_param(far_val, "far_value");
+    prs.read_param(visual.face_rotation_speed, "face_rotation_speed");
+    prs.read_param(visual.block_size, "block_size");
+    prs.read_param(visual.cube_size, "cube_size");
+    prs.read_param(visual.white_texture, "white_texture");
+    prs.read_param(visual.red_texture, "red_texture");
+    prs.read_param(visual.blue_texture, "blue_texture");
+    prs.read_param(visual.green_texture, "green_texture");
+    prs.read_param(visual.orange_texture, "orange_texture");
+    prs.read_param(visual.yellow_texture, "yellow_texture");
+
     WNDCLASSEX wcex;
     HWND hwnd;
     HDC hDC;
@@ -84,20 +104,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
     /* enable OpenGL for the window */
     EnableOpenGL(hwnd, &hDC, &hRC);
 
-    parser prs("../config/config.cfg");
     /* reading rendering parameters */
-    visualizer visual;
-    float tick_speed, cube_rotation_angle, cube_rotation_speed;
-    prs.read_param(tick_speed, "tick_speed");
-    prs.read_param(cube_rotation_angle, "tick_speed");
-    prs.read_param(cube_rotation_speed, "cube_rotation_speed");
-    prs.read_param(visual.face_rotation_speed, "face_rotation_speed");
-    prs.read_param(visual.block_size, "block_size");
-    prs.read_param(visual.cube_size, "cube_size");
 
     glEnable(GL_DEPTH_TEST);
 
-    glFrustum(-1,1, -1,1, 2,800);
+    glFrustum(-1,1, -1,1, near_val,far_val);
 
     cube cb(3), tmp(3);
     cb.generate_cube();
@@ -209,7 +220,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             glLoadIdentity();
             float k;
             k = LOWORD(lParam) / (float)HIWORD(lParam);
-            glFrustum(-k,k, -1,1, 2,800);
+            glFrustum(-k,k, -1,1, 0,800);
         break;
 
         case WM_DESTROY:

@@ -356,7 +356,7 @@ void visualizer::texture_initialization(unsigned int& wt, unsigned int& yt,unsig
                             unsigned int& ot, unsigned int& gt,unsigned int& bt)
 {
     int width, height, cnt;
-    unsigned char *data = stbi_load("../textures/white.jpg", &width, &height, &cnt, 0);
+    unsigned char *data = stbi_load(white_texture.c_str(), &width, &height, &cnt, 0);
 
     glGenTextures(1, &texture_white);
     glBindTexture(GL_TEXTURE_2D, texture_white);
@@ -383,7 +383,7 @@ void visualizer::texture_initialization(unsigned int& wt, unsigned int& yt,unsig
     glBindTexture(GL_TEXTURE_2D, 0);
     stbi_image_free(data);
 
-    data = stbi_load("../textures/red.png", &width, &height, &cnt, 0);
+    data = stbi_load(red_texture.c_str(), &width, &height, &cnt, 0);
 
     glGenTextures(1, &texture_red);
     glBindTexture(GL_TEXTURE_2D, texture_red);
@@ -396,7 +396,7 @@ void visualizer::texture_initialization(unsigned int& wt, unsigned int& yt,unsig
     glBindTexture(GL_TEXTURE_2D, 0);
     stbi_image_free(data);
 
-    data = stbi_load("../textures/orange.jpg", &width, &height, &cnt, 0);
+    data = stbi_load(orange_texture.c_str(), &width, &height, &cnt, 0);
 
     glGenTextures(1, &texture_orange);
     glBindTexture(GL_TEXTURE_2D, texture_orange);
@@ -409,7 +409,7 @@ void visualizer::texture_initialization(unsigned int& wt, unsigned int& yt,unsig
     glBindTexture(GL_TEXTURE_2D, 0);
     stbi_image_free(data);
 
-    data = stbi_load("../textures/green.jpg", &width, &height, &cnt, 0);
+    data = stbi_load(green_texture.c_str(), &width, &height, &cnt, 0);
 
     glGenTextures(1, &texture_green);
     glBindTexture(GL_TEXTURE_2D, texture_green);
@@ -422,7 +422,7 @@ void visualizer::texture_initialization(unsigned int& wt, unsigned int& yt,unsig
     glBindTexture(GL_TEXTURE_2D, 0);
     stbi_image_free(data);
 
-    data = stbi_load("../textures/blue.png", &width, &height, &cnt, 0);
+    data = stbi_load(blue_texture.c_str(), &width, &height, &cnt, 0);
 
     glGenTextures(1, &texture_blue);
     glBindTexture(GL_TEXTURE_2D, texture_blue);

@@ -23,4 +23,5 @@ public:
     float face_rotation_speed;
     float block_size;
     int cube_size;
+    std::string blue_texture, green_texture, orange_texture, red_texture, white_texture, yellow_texture;
 };
