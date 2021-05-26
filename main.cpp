@@ -7,11 +7,7 @@
 #include "algorithm/algorithm.h"
 #include "visual/camera.h"
 #include "visual/player.h"
-
-float xAlpha = 20;
-float zAlpha = 0;
-
-POINTFLOAT pos = {0, 0};
+#include "config/parser.h"
 
 void ShowWorld()
 {
@@ -35,29 +31,6 @@ void ShowWorld()
         }
 }
 
-void MoveCamera()
-{
-    if (GetKeyState(VK_UP) < 0) xAlpha += 2;
-    if (GetKeyState(VK_DOWN) < 0) xAlpha -= 2;
-    if (GetKeyState(VK_RIGHT) < 0) zAlpha -= 2;
-    if (GetKeyState(VK_LEFT) < 0) zAlpha += 2;
-
-    float angle = -zAlpha / 180 * M_PI;
-    float speed = 0, vspeed = 0;
-    if (GetKeyState('W') < 0) speed = 0.1;
-    if (GetKeyState('S') < 0) speed = -0.1;
-    if (speed != 0)
-    {
-        pos.x += sin(angle) * speed;
-        pos.y += cos(angle) * speed;
-    }
-    //speed = 0;
-
-    glRotatef(-xAlpha, 1,0,0);
-    glRotatef(-zAlpha, 0,0,1);
-    glTranslatef(-pos.x,-pos.y, -3);
-}
-
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 void EnableOpenGL(HWND hwnd, HDC*, HGLRC*);
 void DisableOpenGL(HWND, HDC, HGLRC);
@@ -73,7 +46,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
     HGLRC hRC;
     MSG msg;
     BOOL bQuit = FALSE;
-    float theta = 0.0f;
 
     /* register window class */
     wcex.cbSize = sizeof(WNDCLASSEX);
@@ -112,15 +84,26 @@ int WINAPI WinMain(HINSTANCE hInstance,
     /* enable OpenGL for the window */
     EnableOpenGL(hwnd, &hDC, &hRC);
 
+    parser prs("../config/config.cfg");
+    /* reading rendering parameters */
+    visualizer visual;
+    float tick_speed, cube_rotation_angle, cube_rotation_speed;
+    prs.read_param(tick_speed, "tick_speed");
+    prs.read_param(cube_rotation_angle, "tick_speed");
+    prs.read_param(cube_rotation_speed, "cube_rotation_speed");
+    prs.read_param(visual.face_rotation_speed, "face_rotation_speed");
+    prs.read_param(visual.block_size, "block_size");
+    prs.read_param(visual.cube_size, "cube_size");
+
     glEnable(GL_DEPTH_TEST);
 
     glFrustum(-1,1, -1,1, 2,800);
 
     cube cb(3), tmp(3);
     cb.generate_cube();
-    unsigned int wt, yt, rt, ot, gt, bt;
 
-    texture_initialization(wt, yt, rt, ot, gt, bt);
+    unsigned int wt, yt, rt, ot, gt, bt;
+    visual.texture_initialization(wt, yt, rt, ot, gt, bt);
     cb.generate_texture(wt, yt, rt, ot, gt, bt);
 
     //tmp.generate_cube();
@@ -132,17 +115,15 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     formatting(algo.log());
 
-    float hight = 1;
+    float hight = 4;
     std::string cmd = algo.log()[0];
-    bool f = true;
-    bool flag = false;
     int i = 0;
 
     camera cam(0,0,1.7, 0,0);
     player gamer(cam);
 
-
     /* program main loop */
+    bool f = true, flag = false;
     while (!bQuit)
     {
         /* check for messages */
@@ -162,6 +143,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
         else
         {
             /* OpenGL animation code goes here */
+            float edge_size = visual.block_size * visual.cube_size;
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -174,17 +156,17 @@ int WINAPI WinMain(HINSTANCE hInstance,
                 ShowWorld();
 
                 glTranslatef(6, 6, hight);
-                glTranslatef(1.5, 1.5, 0);
-                glRotatef(theta, 0, 0, 1);
-                glTranslatef(-1.5, -1.5, 0);
+                glTranslatef(edge_size/2, edge_size/2, 0);
+                glRotatef(cube_rotation_angle, 0, 0, 1);
+                glTranslatef(-edge_size/2, -edge_size/2, 0);
                     if (flag)
                     {
                         f = false;
-                        draw_cube(manager);
+                        visual.draw_cube(manager);
                     }
                     else
                     {
-                        f = rotate_visualization(manager, cmd);
+                        f = visual.rotate_visualization(manager, cmd);
                     }
             glPopMatrix();
 
@@ -200,8 +182,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
             SwapBuffers(hDC);
 
-            theta += 0.5f;
-            Sleep (0.01);
+            cube_rotation_angle += cube_rotation_speed;
+            Sleep (tick_speed);
         }
     }
 

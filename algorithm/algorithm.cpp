@@ -64,11 +64,11 @@ void algorithm::first_stage()
                         ||  hasColors(manager_[i][j][k], WHITE, WHITE, BLUE))
                         && (!isInUpperCross(manager_[i][j][k])))
                     {
-                        std::cout << i << ' ' << j << ' ' << k << std::endl;
+                        //std::cout << i << ' ' << j << ' ' << k << std::endl;
                         to_bottom_position(manager_[i][j][k]);
-                        std::cout << "\n";
+                        //std::cout << "\n";
                         to_upper_position(manager_[i][j][k]);
-                        std::cout << "\n";
+                        //std::cout << "\n";
                     }
                 }
             }

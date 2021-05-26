@@ -116,4 +116,3 @@ bool helper_function::hasColors (block& blk, rc_types::colors clr1, rc_types::co
     }
     return (f1 && f2 && f3);
 }
-
