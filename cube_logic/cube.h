@@ -7,6 +7,7 @@ class cube {
 public:
     explicit cube(size_t size);
     void generate_cube();
+    void generate_texture(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
 
     size_t size() const;
     std::vector<std::vector<block>>& operator[] (size_t);

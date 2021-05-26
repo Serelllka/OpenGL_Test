@@ -118,16 +118,19 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     cube cb(3), tmp(3);
     cb.generate_cube();
-    tmp.generate_cube();
+    unsigned int wt, yt, rt, ot, gt, bt;
+
+    texture_initialization(wt, yt, rt, ot, gt, bt);
+    cb.generate_texture(wt, yt, rt, ot, gt, bt);
+
+    //tmp.generate_cube();
+
     lay_manager manager(&cb);
     algorithm algo(manager);
-    algo.makeRotation("F R U B L B'");
+    algo.makeRotation("F R U B L B' D F' B' U2");
     algo.solution();
-    std::cout << std::endl;
 
     formatting(algo.log());
-    for (auto it : algo.log())
-        std::cout << it << ' ';
 
     float hight = 1;
     std::string cmd = algo.log()[0];
@@ -137,7 +140,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     camera cam(0,0,1.7, 0,0);
     player gamer(cam);
-    texture_initialization();
+
 
     /* program main loop */
     while (!bQuit)
@@ -198,7 +201,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
             SwapBuffers(hDC);
 
             theta += 0.5f;
-            Sleep (1);
+            Sleep (0.01);
         }
     }
 

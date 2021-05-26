@@ -64,11 +64,11 @@ void algorithm::first_stage()
                         ||  hasColors(manager_[i][j][k], WHITE, WHITE, BLUE))
                         && (!isInUpperCross(manager_[i][j][k])))
                     {
-                        //std::cout << i << ' ' << j << ' ' << k << std::endl;
+                        std::cout << i << ' ' << j << ' ' << k << std::endl;
                         to_bottom_position(manager_[i][j][k]);
-                        //std::cout << "\n";
+                        std::cout << "\n";
                         to_upper_position(manager_[i][j][k]);
-                        //std::cout << "\n";
+                        std::cout << "\n";
                     }
                 }
             }
@@ -105,7 +105,23 @@ void algorithm::to_upper_position(block& blka)
 
     for (int i = 0; i < 3; ++i)
         for (int j = 0; j < 3; ++j)
-            if((manager_[i][j][0][DWN] == WHITE) && isEdge(manager_[i][j][0])) blk = &manager_[i][j][0];
+            if(isEdge(manager_[i][j][0]) &&
+                    (hasColors(manager_[i][j][0], WHITE, WHITE, ORANGE)
+                 ||  hasColors(manager_[i][j][0], WHITE, WHITE, GREEN)
+                 ||  hasColors(manager_[i][j][0], WHITE, WHITE, RED)
+                 ||  hasColors(manager_[i][j][0], WHITE, WHITE, BLUE))) blk = &manager_[i][j][0];
+
+    if (blk->edges_[DWN] != WHITE)
+    {
+        if (blk->edges_[FRT] != BLACK)
+            makeRotation("D F' R F R'");
+        if (blk->edges_[BCK] != BLACK)
+            makeRotation("D B' L B L'");
+        if (blk->edges_[RGT] != BLACK)
+            makeRotation("D R' B R B'");
+        if (blk->edges_[LFT] != BLACK)
+            makeRotation("D L' F L F'");
+    }
 
     int cp, lp, count;
     for (int i = 0; i < blk->edges_.size(); ++i)

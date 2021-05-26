@@ -3,7 +3,12 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-unsigned int texture;
+unsigned int texture_white;
+unsigned int texture_yellow;
+unsigned int texture_red;
+unsigned int texture_orange;
+unsigned int texture_green;
+unsigned int texture_blue;
 
 void draw_line(float x1, float y1, float z1, float x2, float y2, float z2)
 {
@@ -83,52 +88,144 @@ void draw_cube(lay_manager& manager)
 
 void draw_block(block& blk, float x, float y, float z)
 {
-    float upp[]     = {0,0,1, 1,0,1, 1,1,1, 0,1,1,  //UPP
-                       0,0,0, 1,0,0, 1,1,0, 0,1,0,  //DOWN
-                       0,1,0, 1,1,0, 1,1,1, 0,1,1,  //RIGHT
-                       0,0,0, 1,0,0, 1,0,1, 0,0,1,  //LEFT
-                       1,0,0, 1,1,0, 1,1,1, 1,0,1,  //FRONT
-                       0,0,0, 0,1,0, 0,1,1, 0,0,1}; //BACK
+    float upp[]     = {0,0,1, 1,0,1, 1,1,1, 0,1,1, //UPP
+                       0,0,0, 1,0,0, 1,1,0, 0,1,0, //DOWN
+                        0,1,0, 1,1,0, 1,1,1, 0,1,1, //RIGHT
+                        0,0,0, 1,0,0, 1,0,1, 0,0,1, //LEFT
+                        1,0,0, 1,1,0, 1,1,1, 1,0,1, //FRONT
+                        0,0,0, 0,1,0, 0,1,1, 0,0,1}; //BACK
 
-    float texCoord[] = {0,0, 0,1, 1,1, 1,0};
 
     for (int i = 0; i < 24; ++i)
     {
         upp[3 * i] += x;    upp[3 * i + 1] += y;    upp[3 * i + 2] += z;
     }
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
 
     glPushMatrix();
     glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, upp);
+
+    //float texCoordUpp[] = {0,0, 0,1, 1,1, 1,0};
+    float coords[] = {0,0, 0,0, 0,0, 0,0,
+                      0,0, 0,0, 0,0, 0,0,
+                      0,0, 0,0, 0,0, 0,0,
+                      0,0, 0,0, 0,0, 0,0,
+                      0,0, 0,0, 0,0, 0,0,
+                      0,0, 0,0, 0,0, 0,0,};
+
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-    set_color(blk[rc_types::UPP]);
-    glVertexPointer(3, GL_FLOAT, 0, &upp);
-    glTexCoordPointer(2, GL_FLOAT, 0, texCoord);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-    //glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    if (blk[rc_types::UPP] == rc_types::BLACK)
+    {
+        set_color(blk[rc_types::UPP]);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    }
+    else
+    {
+        for (int i = 0; i < 8; ++i)
+            coords[i] = blk.texture_positions[rc_types::UPP][i];
+        for (int i = 0; i < 8; ++i)
+            //set_color(blk[rc_types::UPP]);
+            set_color(rc_types::WHITE);
 
-    set_color(blk[rc_types::DWN]);
-    glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
+            glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::UPP]);
+            glTexCoordPointer(2, GL_FLOAT, 0, coords);
+            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    }
 
-    set_color(blk[rc_types::RGT]);
-    glDrawArrays(GL_TRIANGLE_FAN, 8, 4);
+    if (blk[rc_types::DWN] == rc_types::BLACK)
+    {
+        set_color(blk[rc_types::DWN]);
+        glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
+    }
+    else
+    {
+        for (int i = 8; i < 16; ++i)
+            coords[i] = blk.texture_positions[rc_types::DWN][i - 8];
 
-    set_color(blk[rc_types::LFT]);
-    glDrawArrays(GL_TRIANGLE_FAN, 12, 4);
+            //set_color(blk[rc_types::DWN]);
+            set_color(rc_types::WHITE);
 
-    set_color(blk[rc_types::FRT]);
-    glDrawArrays(GL_TRIANGLE_FAN, 16, 4);
+            glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::DWN]);
+            glTexCoordPointer(2, GL_FLOAT, 0, coords);
+            glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
+    }
 
-    set_color(blk[rc_types::BCK]);
-    glDrawArrays(GL_TRIANGLE_FAN, 20, 4);
-    glPopMatrix();
+    if (blk[rc_types::RGT] == rc_types::BLACK)
+    {
+        set_color(blk[rc_types::RGT]);
+        glDrawArrays(GL_TRIANGLE_FAN, 8, 4);
+    }
+    else
+    {
+        for (int i = 16; i < 24; ++i)
+            coords[i] = blk.texture_positions[rc_types::RGT][i - 16];
+            //set_color(blk[rc_types::RGT]);
+            set_color(rc_types::WHITE);
 
-    glDisableClientState(GL_VERTEX_ARRAY);
+            glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::RGT]);
+            glTexCoordPointer(2, GL_FLOAT, 0, coords);
+            glDrawArrays(GL_TRIANGLE_FAN, 8, 4);
+    }
+
+    if (blk[rc_types::LFT] == rc_types::BLACK)
+    {
+        set_color(blk[rc_types::LFT]);
+        glDrawArrays(GL_TRIANGLE_FAN, 12, 4);
+    }
+    else
+    {
+        for (int i = 24; i < 32; ++i)
+            coords[i] = blk.texture_positions[rc_types::LFT][i - 24];
+            //set_color(blk[rc_types::LFT]);
+            set_color(rc_types::WHITE);
+
+            glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::LFT]);
+            glTexCoordPointer(2, GL_FLOAT, 0, coords);
+            glDrawArrays(GL_TRIANGLE_FAN, 12, 4);
+    }
+
+    if (blk[rc_types::FRT] == rc_types::BLACK)
+    {
+        set_color(blk[rc_types::FRT]);
+        glDrawArrays(GL_TRIANGLE_FAN, 16, 4);
+    }
+    else
+    {
+        for (int i = 32; i < 40; ++i)
+            coords[i] = blk.texture_positions[rc_types::FRT][i - 32];
+        //set_color(blk[rc_types::FRT]);
+        set_color(rc_types::WHITE);
+
+        glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::FRT]);
+        glTexCoordPointer(2, GL_FLOAT, 0, coords);
+        glDrawArrays(GL_TRIANGLE_FAN, 16, 4);
+    }
+
+    if (blk[rc_types::BCK] == rc_types::BLACK)
+    {
+        set_color(blk[rc_types::BCK]);
+        glDrawArrays(GL_TRIANGLE_FAN, 20, 4);
+    }
+    else
+    {
+        for (int i = 40; i < 48; ++i)
+            coords[i] = blk.texture_positions[rc_types::BCK][i - 40];
+        //set_color(blk[rc_types::BCK]);
+        set_color(rc_types::WHITE);
+
+        glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::BCK]);
+        glTexCoordPointer(2, GL_FLOAT, 0, coords);
+        glDrawArrays(GL_TRIANGLE_FAN, 20, 4);
+    }
+
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
+    glPopMatrix();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisableClientState(GL_VERTEX_ARRAY);
     draw_blocks_grid(blk, x, y, z);
 
     x = -x; y = -y; z = -z;
@@ -174,7 +271,7 @@ bool rotate_visualization(lay_manager& manager, std::string cmd)
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
                 draw_block(manager[i][j][0], i, j, 0);
-    } // it's working!
+    }
     else if (cmd == "F" || cmd == "F'" || cmd == "F2")
     {
         for(int i = 0; i < 2; ++i)
@@ -250,19 +347,93 @@ bool rotate_visualization(lay_manager& manager, std::string cmd)
     return false;
 }
 
-void texture_initialization()
+void texture_initialization(unsigned int& wt, unsigned int& yt,unsigned int& rt,
+                            unsigned int& ot, unsigned int& gt,unsigned int& bt)
 {
     int width, height, cnt;
-    unsigned char *data = stbi_load("../textures/rem.png", &width, &height, &cnt, 0);
+    unsigned char *data = stbi_load("../textures/white.jpg", &width, &height, &cnt, 0);
 
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glGenTextures(1, &texture_white);
+    glBindTexture(GL_TEXTURE_2D, texture_white);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
                                 0, cnt == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
     glBindTexture(GL_TEXTURE_2D, 0);
+
     stbi_image_free(data);
+
+    data = stbi_load("../textures/yellow.png", &width, &height, &cnt, 0);
+
+    glGenTextures(1, &texture_yellow);
+    glBindTexture(GL_TEXTURE_2D, texture_yellow);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+                 0, cnt == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    stbi_image_free(data);
+
+    data = stbi_load("../textures/red.png", &width, &height, &cnt, 0);
+
+    glGenTextures(1, &texture_red);
+    glBindTexture(GL_TEXTURE_2D, texture_red);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+                 0, cnt == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    stbi_image_free(data);
+
+    data = stbi_load("../textures/orange.jpg", &width, &height, &cnt, 0);
+
+    glGenTextures(1, &texture_orange);
+    glBindTexture(GL_TEXTURE_2D, texture_orange);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+                 0, cnt == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    stbi_image_free(data);
+
+    data = stbi_load("../textures/green.jpg", &width, &height, &cnt, 0);
+
+    glGenTextures(1, &texture_green);
+    glBindTexture(GL_TEXTURE_2D, texture_green);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+                 0, cnt == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    stbi_image_free(data);
+
+    data = stbi_load("../textures/blue.png", &width, &height, &cnt, 0);
+
+    glGenTextures(1, &texture_blue);
+    glBindTexture(GL_TEXTURE_2D, texture_blue);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
+                 0, cnt == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    stbi_image_free(data);
+
+    wt = texture_white;
+    yt = texture_yellow;
+    rt = texture_red;
+    bt = texture_blue;
+    gt = texture_green;
+    ot = texture_orange;
 }

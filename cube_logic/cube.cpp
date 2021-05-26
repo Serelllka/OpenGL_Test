@@ -46,3 +46,52 @@ bool cube::check() {
             }
     return true;
 }
+
+void cube::generate_texture(unsigned int wt, unsigned int yt, unsigned int rt,
+                            unsigned int ot, unsigned int gt, unsigned int bt)
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            for (int k = 0; k < 3; ++k)
+            {
+                for (auto& it : matrix3d_[i][j][k].texture_types) it = 0;
+                if (k == size_ - 1) matrix3d_[i][j][k].texture_types[rc_types::UPP] = wt;
+                if (k == 0)         matrix3d_[i][j][k].texture_types[rc_types::DWN] = yt;
+                if (j == size_ - 1) matrix3d_[i][j][k].texture_types[rc_types::RGT] = rt;
+                if (j == 0)         matrix3d_[i][j][k].texture_types[rc_types::LFT] = ot;
+                if (i == size_ - 1) matrix3d_[i][j][k].texture_types[rc_types::FRT] = gt;
+                if (i == 0)         matrix3d_[i][j][k].texture_types[rc_types::BCK] = bt;
+            }
+        }
+    }
+
+    float cringe[] = {0,0, 0.33,0, 0.33,0.33, 0,0.33};
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            for (int k = 0; k < 4; ++k)
+            {
+                matrix3d_[i][j][2].texture_positions[rc_types::UPP][2 * k] =     cringe[2 * k] + i * 0.33;
+                matrix3d_[i][j][2].texture_positions[rc_types::UPP][2 * k + 1] = cringe[2 * k + 1] + j * 0.33;
+
+                matrix3d_[i][j][0].texture_positions[rc_types::DWN][2 * k] =     cringe[2 * k] + i * 0.33;
+                matrix3d_[i][j][0].texture_positions[rc_types::DWN][2 * k + 1] = cringe[2 * k + 1] + j * 0.33;
+
+                matrix3d_[i][0][j].texture_positions[rc_types::LFT][2 * k] =     cringe[2 * k] + i * 0.33;
+                matrix3d_[i][0][j].texture_positions[rc_types::LFT][2 * k + 1] = cringe[2 * k + 1] + j * 0.33;
+
+                matrix3d_[i][2][j].texture_positions[rc_types::RGT][2 * k] =     cringe[2 * k] + i * 0.33;
+                matrix3d_[i][2][j].texture_positions[rc_types::RGT][2 * k + 1] = cringe[2 * k + 1] + j * 0.33;
+
+                matrix3d_[0][i][j].texture_positions[rc_types::BCK][2 * k] =     cringe[2 * k] + i * 0.33;
+                matrix3d_[0][i][j].texture_positions[rc_types::BCK][2 * k + 1] = cringe[2 * k + 1] + j * 0.33;
+
+                matrix3d_[2][i][j].texture_positions[rc_types::FRT][2 * k] =     cringe[2 * k] + i * 0.33;
+                matrix3d_[2][i][j].texture_positions[rc_types::FRT][2 * k + 1] = cringe[2 * k + 1] + j * 0.33;
+            }
+        }
+    }
+}
