@@ -19,11 +19,11 @@ public:
     void first_stage();
 
     void second_stage();
-    bool second_stage_checker(block&);
+    static bool second_stage_checker(block&);
     void to_corner_position(lay_manager&, block&);
 
-    bool third_stage_checker(block&);
-    bool third_stage_lay_checker(block& blk);
+    static bool third_stage_checker(block&);
+    static bool third_stage_lay_checker(block& blk);
     void third_stage();
     bool toBottom(lay_manager&);
 
@@ -39,6 +39,8 @@ public:
     void seventh_stage();
 
     void solution();
+
+    bool is_solved();
 
     lay_manager& manager();
     std::vector<std::string>& log();

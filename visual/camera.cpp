@@ -1,5 +1,4 @@
-
-#include <iostream>
+#include <cmath>
 #include "camera.h"
 
 camera::camera(float x, float y, float z, float x_rot, float z_rot)
@@ -16,7 +15,7 @@ void camera::rotate(float x_angle, float z_angle)
     if(this->x_rot > 360) this->x_rot -= 360;
 }
 
-void camera::apply()
+void camera::apply() const
 {
     glRotatef(-this->x_rot, 1,0,0);
     glRotatef(-this->z_rot, 0,0,1);
@@ -38,15 +37,15 @@ void camera::move(int forward_move, int right_move, float speed)
 
     if (speed != 0)
     {
-        this->x += sin(angle) * speed;
-        this->y += cos(angle) * speed;
+        this->x += std::sin(angle) * speed;
+        this->y += std::cos(angle) * speed;
     }
 }
 
 void camera::lift(int up_move, float speed)
 {
     if (up_move != 0) {
-        this->z += speed * up_move;
+        this->z += speed * (float)up_move;
     }
 }
 

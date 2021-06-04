@@ -17,7 +17,7 @@ void algorithm::makeRotation(std::string cmd)
             ++i;
         }
         ++i;
-        std::cout << str << ' ';
+        //std::cout << str << ' ';
         manager_.rotate(str);
         solution_log_.push_back(str);
     }
@@ -481,10 +481,12 @@ void algorithm::sixth_stage()
         for (auto& it : right_front)
             makeRotation(it);
     }
+    int count = 0;
     while (!hasColors(manager_[0][0][0], BLUE, ORANGE, YELLOW))
     {
         for (auto& it : back_left)
             makeRotation(it);
+        if (++count > 500) return;
     }
 }
 
@@ -509,18 +511,35 @@ std::vector<std::string>& algorithm::log() {
 }
 
 void algorithm::solution() {
-    std::cout << "\nfirst stage:\n";
+    //std::cout << "\nfirst stage:\n";
     this->first_stage();
-    std::cout << "\nsecond stage:\n";
+    //std::cout << "\nsecond stage:\n";
     this->second_stage();
-    std::cout << "\nthird stage:\n";
+    //std::cout << "\nthird stage:\n";
     this->third_stage();
-    std::cout << "\nfourth stage:\n";
+    //std::cout << "\nfourth stage:\n";
     this->fourth_stage();
-    std::cout << "\nfifth stage:\n";
+    //std::cout << "\nfifth stage:\n";
     this->fifth_stage();
-    std::cout << "\nsixth stage:\n";
+    //std::cout << "\nsixth stage:\n";
     this->sixth_stage();
-    std::cout << "\nseventh stage:\n";
+    //std::cout << "\nseventh stage:\n";
     this->seventh_stage();
+}
+
+bool algorithm::is_solved()
+{
+    for(int i = 0; i < 3; ++i)
+    {
+        for(int j = 0; j < 3; ++j)
+        {
+            if (manager_[i][j][2][UPP] != rc_types::WHITE)  return false;
+            if (manager_[i][j][0][DWN] != rc_types::YELLOW) return false;
+            if (manager_[i][2][j][RGT] != rc_types::RED)    return false;
+            if (manager_[i][0][j][LFT] != rc_types::ORANGE) return false;
+            if (manager_[2][i][j][FRT] != rc_types::GREEN)  return false;
+            if (manager_[0][j][j][BCK] != rc_types::BLUE)   return false;
+        }
+    }
+    return true;
 }

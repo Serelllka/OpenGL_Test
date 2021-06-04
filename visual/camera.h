@@ -1,12 +1,12 @@
 #pragma once
 #include <GL/gl.h>
-#include <math.h>
+#include <cmath>
 
 
 class camera {
 public:
     camera(float, float, float, float, float);
-    void apply();
+    void apply() const;
 
     void rotate(float, float);
     void move(int, int, float);

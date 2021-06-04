@@ -3,7 +3,8 @@
 #include <cstddef>
 #include "block.h"
 
-class cube {
+class cube
+{
 public:
     explicit cube(size_t size);
     void generate_cube();
@@ -12,7 +13,7 @@ public:
     size_t size() const;
     std::vector<std::vector<block>>& operator[] (size_t);
 
-    bool check();
+    [[maybe_unused]] bool check();
 
 private:
     size_t size_;

@@ -5,9 +5,9 @@
 #include <algorithm>
 #include "visual/visualizer.h"
 #include "algorithm/algorithm.h"
-#include "visual/camera.h"
 #include "visual/player.h"
 #include "config/parser.h"
+#include "input/input_class.h"
 
 float near_val, far_val;
 
@@ -31,6 +31,12 @@ void ShowWorld()
                 glPopMatrix();
             }
         }
+}
+
+bool pause()
+{
+    bool f = GetKeyState('P') < 0;
+    std::cout << f;
 }
 
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
@@ -112,64 +118,83 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     cube cb(3), tmp(3);
     cb.generate_cube();
+    tmp.generate_cube();
+
+    //input_methods::generate_cube_from_file("../input.txt", tmp);
+    //input_methods::generate_cube_from_file("../input.txt", cb);
+    lay_manager tmp_manager(&tmp), manager(&cb);
+    algorithm algo(tmp_manager);
 
     unsigned int wt, yt, rt, ot, gt, bt;
     visual.texture_initialization(wt, yt, rt, ot, gt, bt);
     cb.generate_texture(wt, yt, rt, ot, gt, bt);
 
-    //tmp.generate_cube();
 
-    lay_manager manager(&cb);
-    algorithm algo(manager);
+    //lay_manager manager(&cb);
+    //algorithm algo(manager);
     algo.makeRotation("F R U B L B' D F' B' U2");
-    algo.solution();
+    //algo.solution();
 
-    formatting(algo.log());
+    //formatting(algo.log());
 
     float hight = 4;
-    std::string cmd = algo.log()[0];
+    //std::string cmd = algo.log()[0];
     int i = 0;
 
     camera cam(0,0,1.7, 0,0);
     player gamer(cam);
 
     /* program main loop */
-    bool f = true, flag = false;
-    while (!bQuit)
+    bool flag = false, f = false;
+    bool isPaused = false;
+    if (!input_methods::check_for_correctness(algo))
     {
-        /* check for messages */
-        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        std::cout << "The Rubick's cube can't be solved from this position";
+    }
+    else
+    {
+        formatting(algo.log());
+        std::string cmd = algo.log().size() ? algo.log()[0] : "";
+        float edge_size = visual.block_size * visual.cube_size;
+        while (!bQuit)
         {
-            /* handle or dispatch messages */
-            if (msg.message == WM_QUIT)
+            /* check for messages */
+            if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+                /* handle or dispatch messages */
+                if (msg.message == WM_QUIT) {
+                    bQuit = TRUE;
+                } else {
+                    TranslateMessage(&msg);
+                    DispatchMessage(&msg);
+                }
+            } else
             {
-                bQuit = TRUE;
-            }
-            else
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-        else
-        {
-            /* OpenGL animation code goes here */
-            float edge_size = visual.block_size * visual.cube_size;
+                /* OpenGL animation code goes here */
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            glPushMatrix();
-                //MoveCamera();
+                glPushMatrix();
 
                 if (GetForegroundWindow() == hwnd)
+                {
                     gamer.move();
+                    if (GetKeyState('P') < 0)
+                        isPaused = true;
+                    if (GetKeyState('C') < 0)
+                        isPaused = false;
+                    if (GetKeyState('Z') < 0)
+                        input_methods::save_cube_to_file("../output.txt", manager.get_cube());
+                }
                 gamer.get_camera().apply();
                 ShowWorld();
 
                 glTranslatef(6, 6, hight);
-                glTranslatef(edge_size/2, edge_size/2, 0);
+                glTranslatef(edge_size / 2, edge_size / 2, 0);
                 glRotatef(cube_rotation_angle, 0, 0, 1);
-                glTranslatef(-edge_size/2, -edge_size/2, 0);
+                glTranslatef(-edge_size / 2, -edge_size / 2, 0);
+                //visual.draw_cube(manager);
+                if (!isPaused)
+                {
                     if (flag)
                     {
                         f = false;
@@ -179,22 +204,28 @@ int WINAPI WinMain(HINSTANCE hInstance,
                     {
                         f = visual.rotate_visualization(manager, cmd);
                     }
-            glPopMatrix();
-
-            if (f)
-            {
-                manager.rotate(algo.log()[i]);
-                ++i;
-                if (i < algo.log().size())
-                    cmd = algo.log()[i];
+                }
                 else
-                    flag = true;
+                {
+                    visual.draw_cube(manager);
+                }
+                glPopMatrix();
+
+                if (f && !isPaused)
+                {
+                    if (i < algo.log().size()) manager.rotate(algo.log()[i]);
+                    ++i;
+                    if (i < algo.log().size())
+                        cmd = algo.log()[i];
+                    else
+                        flag = true;
+                }
+
+                SwapBuffers(hDC);
+
+                cube_rotation_angle += cube_rotation_speed;
+                Sleep(tick_speed);
             }
-
-            SwapBuffers(hDC);
-
-            cube_rotation_angle += cube_rotation_speed;
-            Sleep (tick_speed);
         }
     }
 

@@ -46,14 +46,14 @@ void visualizer::set_color(int8_t color)
     }
 }
 
-void visualizer::draw_blocks_grid(block& blk, float x, float y, float z)
+void visualizer::draw_blocks_grid(block& blk, float x, float y, float z) const
 {
     float edges[] = {0,0,0, 0,0,1,  0,1,0, 0,1,1,  1,0,0, 1,0,1,  1,1,0, 1,1,1,
                      0,0,0, 0,1,0,  0,0,0, 1,0,0,  0,1,0, 1,1,0,  1,0,0, 1,1,0,
                      0,0,1, 0,1,1,  0,0,1, 1,0,1,  0,1,1, 1,1,1,  1,0,1, 1,1,1};
 
-    for (int i = 0; i < 72; ++i)
-        edges[i] *= block_size;
+    for (float & edge : edges)
+        edge *= block_size;
 
     set_color(rc_types::BLACK);
     glLineWidth(3);
@@ -89,7 +89,7 @@ void visualizer::draw_cube(lay_manager& manager)
                 draw_block(manager[i][j][k], i * block_size, j * block_size, k * block_size);
 }
 
-void visualizer::draw_block(block& blk, float x, float y, float z)
+void visualizer::draw_block(block& blk, float x, float y, float z) const
 {
     float upp[]     = {0,0,1, 1,0,1, 1,1,1, 0,1,1, //UPP
                        0,0,0, 1,0,0, 1,1,0, 0,1,0, //DOWN
@@ -165,6 +165,7 @@ void visualizer::draw_block(block& blk, float x, float y, float z)
     {
         for (int i = 16; i < 24; ++i)
             coords[i] = blk.texture_positions[rc_types::RGT][i - 16];
+
             //set_color(blk[rc_types::RGT]);
             set_color(rc_types::WHITE);
 
@@ -182,6 +183,7 @@ void visualizer::draw_block(block& blk, float x, float y, float z)
     {
         for (int i = 24; i < 32; ++i)
             coords[i] = blk.texture_positions[rc_types::LFT][i - 24];
+
         //set_color(blk[rc_types::LFT]);
         set_color(rc_types::WHITE);
 
@@ -199,6 +201,7 @@ void visualizer::draw_block(block& blk, float x, float y, float z)
     {
         for (int i = 32; i < 40; ++i)
             coords[i] = blk.texture_positions[rc_types::FRT][i - 32];
+
         //set_color(blk[rc_types::FRT]);
         set_color(rc_types::WHITE);
 
@@ -216,6 +219,7 @@ void visualizer::draw_block(block& blk, float x, float y, float z)
     {
         for (int i = 40; i < 48; ++i)
             coords[i] = blk.texture_positions[rc_types::BCK][i - 40];
+
         //set_color(blk[rc_types::BCK]);
         set_color(rc_types::WHITE);
 
@@ -239,7 +243,7 @@ void visualizer::draw_block(block& blk, float x, float y, float z)
     }
 }
 
-bool visualizer::rotate_visualization(lay_manager& manager, std::string cmd)
+bool visualizer::rotate_visualization(lay_manager& manager, const std::string& cmd) const
 {
     float edge_size = block_size * cube_size;
     static float theta = 1;
@@ -353,7 +357,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, std::string cmd)
 }
 
 void visualizer::texture_initialization(unsigned int& wt, unsigned int& yt,unsigned int& rt,
-                            unsigned int& ot, unsigned int& gt,unsigned int& bt)
+                            unsigned int& ot, unsigned int& gt,unsigned int& bt) const
 {
     int width, height, cnt;
     unsigned char *data = stbi_load(white_texture.c_str(), &width, &height, &cnt, 0);

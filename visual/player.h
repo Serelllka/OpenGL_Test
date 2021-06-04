@@ -3,7 +3,7 @@
 
 class player {
 public:
-    player(camera);
+    explicit player(camera);
     void rotate_camera(int, int, float);
     camera& get_camera();
 

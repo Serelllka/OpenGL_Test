@@ -18,7 +18,8 @@ void player::rotate_camera(int centerX, int centerY, float speed)
     SetCursorPos(base.x, base.y);
 }
 
-camera &player::get_camera() {
+camera &player::get_camera()
+{
     return camera_;
 }
 

@@ -1,5 +1,4 @@
 #include "cube.h"
-#include "../types.h"
 
 cube::cube(size_t size)
     : size_(size)
@@ -31,7 +30,7 @@ std::vector<std::vector<block>> &cube::operator[](size_t k) {
     return matrix3d_[k];
 }
 
-bool cube::check() {
+[[maybe_unused]] bool cube::check() {
     for (size_t i = 0; i < size_; ++i)
         for (size_t j = 0; j < size_; ++j)
             for (size_t k = 0; k < size_; ++k)
@@ -67,30 +66,30 @@ void cube::generate_texture(unsigned int wt, unsigned int yt, unsigned int rt,
         }
     }
 
-    float cringe[] = {0,0, 0.33,0, 0.33,0.33, 0,0.33};
+    float texture_vertex_coordinates[] = {0,0, 0.33,0, 0.33,0.33, 0,0.33};
     for (int i = 0; i < 3; ++i)
     {
         for (int j = 0; j < 3; ++j)
         {
             for (int k = 0; k < 4; ++k)
             {
-                matrix3d_[i][j][2].texture_positions[rc_types::UPP][2 * k] =     cringe[2 * k] + i * 0.33;
-                matrix3d_[i][j][2].texture_positions[rc_types::UPP][2 * k + 1] = cringe[2 * k + 1] + j * 0.33;
+                matrix3d_[i][j][2].texture_positions[rc_types::UPP][2 * k] =     static_cast<float>(texture_vertex_coordinates[2 * k] + i * 0.33);
+                matrix3d_[i][j][2].texture_positions[rc_types::UPP][2 * k + 1] = static_cast<float>(texture_vertex_coordinates[2 * k + 1] + j * 0.33);
 
-                matrix3d_[i][j][0].texture_positions[rc_types::DWN][2 * k] =     cringe[2 * k] + i * 0.33;
-                matrix3d_[i][j][0].texture_positions[rc_types::DWN][2 * k + 1] = cringe[2 * k + 1] + j * 0.33;
+                matrix3d_[i][j][0].texture_positions[rc_types::DWN][2 * k] =     static_cast<float>(texture_vertex_coordinates[2 * k] + i * 0.33);
+                matrix3d_[i][j][0].texture_positions[rc_types::DWN][2 * k + 1] = static_cast<float>(texture_vertex_coordinates[2 * k + 1] + j * 0.33);
 
-                matrix3d_[i][0][j].texture_positions[rc_types::LFT][2 * k] =     cringe[2 * k] + i * 0.33;
-                matrix3d_[i][0][j].texture_positions[rc_types::LFT][2 * k + 1] = cringe[2 * k + 1] + j * 0.33;
+                matrix3d_[i][0][j].texture_positions[rc_types::LFT][2 * k] =     static_cast<float>(texture_vertex_coordinates[2 * k] + i * 0.33);
+                matrix3d_[i][0][j].texture_positions[rc_types::LFT][2 * k + 1] = static_cast<float>(texture_vertex_coordinates[2 * k + 1] + j * 0.33);
 
-                matrix3d_[i][2][j].texture_positions[rc_types::RGT][2 * k] =     cringe[2 * k] + i * 0.33;
-                matrix3d_[i][2][j].texture_positions[rc_types::RGT][2 * k + 1] = cringe[2 * k + 1] + j * 0.33;
+                matrix3d_[i][2][j].texture_positions[rc_types::RGT][2 * k] =     static_cast<float>(texture_vertex_coordinates[2 * k] + i * 0.33);
+                matrix3d_[i][2][j].texture_positions[rc_types::RGT][2 * k + 1] = static_cast<float>(texture_vertex_coordinates[2 * k + 1] + j * 0.33);
 
-                matrix3d_[0][i][j].texture_positions[rc_types::BCK][2 * k] =     cringe[2 * k] + i * 0.33;
-                matrix3d_[0][i][j].texture_positions[rc_types::BCK][2 * k + 1] = cringe[2 * k + 1] + j * 0.33;
+                matrix3d_[0][i][j].texture_positions[rc_types::BCK][2 * k] =     static_cast<float>(texture_vertex_coordinates[2 * k] + i * 0.33);
+                matrix3d_[0][i][j].texture_positions[rc_types::BCK][2 * k + 1] = static_cast<float>(texture_vertex_coordinates[2 * k + 1] + j * 0.33);
 
-                matrix3d_[2][i][j].texture_positions[rc_types::FRT][2 * k] =     cringe[2 * k] + i * 0.33;
-                matrix3d_[2][i][j].texture_positions[rc_types::FRT][2 * k + 1] = cringe[2 * k + 1] + j * 0.33;
+                matrix3d_[2][i][j].texture_positions[rc_types::FRT][2 * k] =     static_cast<float>(texture_vertex_coordinates[2 * k] + i * 0.33);
+                matrix3d_[2][i][j].texture_positions[rc_types::FRT][2 * k + 1] = static_cast<float>(texture_vertex_coordinates[2 * k + 1] + j * 0.33);
             }
         }
     }

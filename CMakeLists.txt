@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 project(OpenGL)
 
-set(SOURCE_FILES main.cpp visual/camera.cpp visual/camera.h visual/player.cpp visual/player.h config/parser.cpp config/parser.h)
+set(SOURCE_FILES main.cpp visual/camera.cpp visual/camera.h visual/player.cpp visual/player.h config/parser.cpp config/parser.h input/input_class.cpp input/input_class.h)
 set(CMAKE_CXX_STANDARD 17)
 
 set(Boost_INCLUDE_DIR "C:/Program Files/boost/boost_1_75_0")
