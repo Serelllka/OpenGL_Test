@@ -12,10 +12,10 @@ float near_val, far_val;
 std::vector<std::string> Randomize()
 {
     std::vector<std::string> tmp;
-    int n = std::rand() % 17 + 4;
+    int n = rand() % 17 + 4;
     for (int i = 0; i < n; ++i)
     {
-        int k = std::rand() % 6;
+        int k = rand() % 6;
         switch (k)
         {
             case 1:
