@@ -117,11 +117,14 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     glFrustum(-1,1, -1,1, near_val,far_val);
 
-    cube cb(3);
-    lay_manager manager(&cb);
-    algorithm algo(manager);
-    //cube tmp(3);
-    cb.generate_cube();
+    cube cube_for_solution(3); // this cube using for generate solution
+    cube cube_for_rotation(3); // this cube using for making rotations
+    lay_manager solution_manager(&cube_for_solution);
+    lay_manager rotation_manager(&cube_for_rotation);
+    algorithm algo(solution_manager);
+
+    cube_for_solution.generate_cube();
+    cube_for_rotation.generate_cube();
     //tmp.generate_cube();
 
     //input_methods::generate_cube_from_file("../input.txt", tmp);
@@ -190,14 +193,26 @@ int WINAPI WinMain(HINSTANCE hInstance,
                     if (GetKeyState('C') < 0)
                         isPaused = false;
                     if (GetKeyState('Z') < 0)
-                        input_methods::save_cube_to_file("../output.txt", manager.get_cube());
+                        input_methods::save_cube_to_file("../output.txt", solution_manager.get_cube());
                     if (GetKeyState('O') < 0)
-                        input_methods::output_to_console(manager.get_cube());
+                        input_methods::output_to_console(solution_manager.get_cube());
 
                     if (GetKeyState('L') && isPaused)
                     {
-                        input_methods::generate_cube_from_file("../input.txt", cb);
+                        input_methods::generate_cube_from_file("../input.txt", cube_for_solution);
+                        input_methods::generate_cube_from_file("../input.txt", cube_for_rotation);
                         solve_iteration = 0;
+                        algo.log().clear();
+                        if (!input_methods::check_for_correctness(algo))
+                        {
+                            std::cout << "The Rubick's cube can't be solved from this position";
+                            return 1;
+                        }
+                        else
+                        {
+                            //formatting(algo.log());
+                            //cmd = !algo.log().empty() ? algo.log()[0] : "";
+                        }
                     }
                 }
 
@@ -214,22 +229,22 @@ int WINAPI WinMain(HINSTANCE hInstance,
                     if (flag)
                     {
                         f = false;
-                        visual.draw_cube(manager);
+                        visual.draw_cube(rotation_manager);
                     }
                     else
                     {
-                        f = visual.rotate_visualization(manager, cmd);
+                        f = visual.rotate_visualization(rotation_manager, cmd);
                     }
                 }
                 else
                 {
-                    visual.draw_cube(manager);
+                    visual.draw_cube(rotation_manager);
                 }
                 glPopMatrix();
 
                 if (f && !isPaused)
                 {
-                    if (solve_iteration < algo.log().size()) manager.rotate(algo.log()[solve_iteration]);
+                    if (solve_iteration < algo.log().size()) rotation_manager.rotate(algo.log()[solve_iteration]);
                     ++solve_iteration;
                     if (solve_iteration < algo.log().size())
                         cmd = algo.log()[solve_iteration];
