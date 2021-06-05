@@ -31,6 +31,14 @@ void ShowWorld()
         }
 }
 
+bool tick_time(float tick_time)
+{
+    static int count_of_ticks = 0;
+    count_of_ticks %= static_cast<int>(0.2 / tick_time);
+    count_of_ticks++;
+    //std::cout << count_of_ticks;
+    return !(count_of_ticks % static_cast<int>(0.2 / tick_time));
+}
 
 bool pause()
 {
@@ -137,14 +145,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
     visual.texture_initialization(wt, yt, rt, ot, gt, bt);
     //cb.generate_texture(wt, yt, rt, ot, gt, bt);
 
-
-    //lay_manager manager(&cb);
-    //algorithm algo(manager);
-    algo.makeRotation("F R U B L B' D F' B' U2");
-    //algo.solution();
-
-    //formatting(algo.log());
-
     float hight = 4;
     //std::string cmd = algo.log()[0];
 
@@ -165,9 +165,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             /* handle or dispatch messages */
-            if (msg.message == WM_QUIT) {
+            if (msg.message == WM_QUIT)
+            {
                 bQuit = TRUE;
-            } else {
+            }
+            else
+            {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
@@ -213,29 +216,41 @@ int WINAPI WinMain(HINSTANCE hInstance,
                 }
 
                 if ((GetKeyState('1') < 0) && isPaused)
-                {
-                    rotation_manager.rotate("F");
-                }
+                    if(tick_time(tick_speed))
+                    {
+                        rotation_manager.rotate("U");
+                        solution_manager.rotate("U");
+                    }
                 if ((GetKeyState('2') < 0) && isPaused)
-                {
-                    rotation_manager.rotate("F");
-                }
+                    if(tick_time(tick_speed))
+                    {
+                        rotation_manager.rotate("D");
+                        solution_manager.rotate("D");
+                    }
                 if ((GetKeyState('3') < 0) && isPaused)
-                {
-                    rotation_manager.rotate("F");
-                }
+                    if(tick_time(tick_speed))
+                    {
+                        rotation_manager.rotate("R");
+                        solution_manager.rotate("R");
+                    }
                 if ((GetKeyState('4') < 0) && isPaused)
-                {
-                    rotation_manager.rotate("F");
-                }
+                    if(tick_time(tick_speed))
+                    {
+                        rotation_manager.rotate("L");
+                        solution_manager.rotate("L");
+                    }
                 if ((GetKeyState('5') < 0) && isPaused)
-                {
-                    rotation_manager.rotate("F");
-                }
+                    if(tick_time(tick_speed))
+                    {
+                        rotation_manager.rotate("F");
+                        solution_manager.rotate("F");
+                    }
                 if ((GetKeyState('6') < 0) && isPaused)
-                {
-                    rotation_manager.rotate("F");
-                }
+                    if(tick_time(tick_speed))
+                    {
+                        rotation_manager.rotate("B");
+                        solution_manager.rotate("B");
+                    }
             }
 
             gamer.get_camera().apply();
@@ -245,7 +260,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
             glTranslatef(edge_size / 2, edge_size / 2, 0);
             glRotatef(cube_rotation_angle, 0, 0, 1);
             glTranslatef(-edge_size / 2, -edge_size / 2, 0);
-            //visual.draw_cube(manager);
             if (!isPaused)
             {
                 if (is_solved)
