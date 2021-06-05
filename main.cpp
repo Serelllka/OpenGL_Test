@@ -152,114 +152,134 @@ int WINAPI WinMain(HINSTANCE hInstance,
     player gamer(cam);
 
     /* program main loop */
-    bool flag = false, f = false;
+    bool is_solved = false, is_rotated = false;
     bool isPaused = true;
     int solve_iteration = 0;
-    if (!input_methods::check_for_correctness(algo))
+    //formatting(algo.log());
+
+    std::string cmd;
+    float edge_size = visual.block_size * static_cast<float>(visual.cube_size);
+    while (!bQuit)
     {
-        std::cout << "The Rubick's cube can't be solved from this position";
-    }
-    else
-    {
-        formatting(algo.log());
-        std::string cmd = !algo.log().empty() ? algo.log()[0] : "";
-        float edge_size = visual.block_size * static_cast<float>(visual.cube_size);
-        while (!bQuit)
+        /* check for messages */
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
-            /* check for messages */
-            if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+            /* handle or dispatch messages */
+            if (msg.message == WM_QUIT) {
+                bQuit = TRUE;
+            } else {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+        else
+        {
+            /* OpenGL animation code goes here */
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            glPushMatrix();
+
+            if (GetForegroundWindow() == hwnd)
             {
-                /* handle or dispatch messages */
-                if (msg.message == WM_QUIT) {
-                    bQuit = TRUE;
-                } else {
-                    TranslateMessage(&msg);
-                    DispatchMessage(&msg);
+                gamer.move();
+                if (GetKeyState('P') < 0)
+                    isPaused = true;
+                if (GetKeyState('C') < 0)
+                    isPaused = false;
+                if (GetKeyState('Z') < 0)
+                    input_methods::save_cube_to_file("../output.txt", solution_manager.get_cube());
+                if (GetKeyState('O') < 0)
+                    input_methods::output_to_console(solution_manager.get_cube());
+
+                if ((GetKeyState('L') < 0) && isPaused)
+                {
+                    input_methods::generate_cube_from_file("../input.txt", cube_for_solution);
+                    input_methods::generate_cube_from_file("../input.txt", cube_for_rotation);
+                    solve_iteration = 0;
+                    is_rotated = false;
+                    is_solved = false;
+                    algo.log().clear();
+                    if (!input_methods::check_for_correctness(algo))
+                    {
+                        std::cout << "The Rubick's cube can't be solved from this position";
+                        return 1;
+                    }
+                    else
+                    {
+                        formatting(algo.log());
+                        cmd = !algo.log().empty() ? algo.log()[0] : "";
+                    }
+                }
+
+                if ((GetKeyState('1') < 0) && isPaused)
+                {
+                    rotation_manager.rotate("F");
+                }
+                if ((GetKeyState('2') < 0) && isPaused)
+                {
+                    rotation_manager.rotate("F");
+                }
+                if ((GetKeyState('3') < 0) && isPaused)
+                {
+                    rotation_manager.rotate("F");
+                }
+                if ((GetKeyState('4') < 0) && isPaused)
+                {
+                    rotation_manager.rotate("F");
+                }
+                if ((GetKeyState('5') < 0) && isPaused)
+                {
+                    rotation_manager.rotate("F");
+                }
+                if ((GetKeyState('6') < 0) && isPaused)
+                {
+                    rotation_manager.rotate("F");
+                }
+            }
+
+            gamer.get_camera().apply();
+            ShowWorld();
+
+            glTranslatef(6, 6, hight);
+            glTranslatef(edge_size / 2, edge_size / 2, 0);
+            glRotatef(cube_rotation_angle, 0, 0, 1);
+            glTranslatef(-edge_size / 2, -edge_size / 2, 0);
+            //visual.draw_cube(manager);
+            if (!isPaused)
+            {
+                if (is_solved)
+                {
+                    is_rotated = false;
+                    visual.draw_cube(rotation_manager);
+                }
+                else
+                {
+                    is_rotated = visual.rotate_visualization(rotation_manager, cmd);
                 }
             }
             else
             {
-                /* OpenGL animation code goes here */
-
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-                glPushMatrix();
-
-                if (GetForegroundWindow() == hwnd)
-                {
-                    gamer.move();
-                    if (GetKeyState('P') < 0)
-                        isPaused = true;
-                    if (GetKeyState('C') < 0)
-                        isPaused = false;
-                    if (GetKeyState('Z') < 0)
-                        input_methods::save_cube_to_file("../output.txt", solution_manager.get_cube());
-                    if (GetKeyState('O') < 0)
-                        input_methods::output_to_console(solution_manager.get_cube());
-
-                    if (GetKeyState('L') && isPaused)
-                    {
-                        input_methods::generate_cube_from_file("../input.txt", cube_for_solution);
-                        input_methods::generate_cube_from_file("../input.txt", cube_for_rotation);
-                        solve_iteration = 0;
-                        algo.log().clear();
-                        if (!input_methods::check_for_correctness(algo))
-                        {
-                            std::cout << "The Rubick's cube can't be solved from this position";
-                            return 1;
-                        }
-                        else
-                        {
-                            //formatting(algo.log());
-                            //cmd = !algo.log().empty() ? algo.log()[0] : "";
-                        }
-                    }
-                }
-
-                gamer.get_camera().apply();
-                ShowWorld();
-
-                glTranslatef(6, 6, hight);
-                glTranslatef(edge_size / 2, edge_size / 2, 0);
-                glRotatef(cube_rotation_angle, 0, 0, 1);
-                glTranslatef(-edge_size / 2, -edge_size / 2, 0);
-                //visual.draw_cube(manager);
-                if (!isPaused)
-                {
-                    if (flag)
-                    {
-                        f = false;
-                        visual.draw_cube(rotation_manager);
-                    }
-                    else
-                    {
-                        f = visual.rotate_visualization(rotation_manager, cmd);
-                    }
-                }
-                else
-                {
-                    visual.draw_cube(rotation_manager);
-                }
-                glPopMatrix();
-
-                if (f && !isPaused)
-                {
-                    if (solve_iteration < algo.log().size()) rotation_manager.rotate(algo.log()[solve_iteration]);
-                    ++solve_iteration;
-                    if (solve_iteration < algo.log().size())
-                        cmd = algo.log()[solve_iteration];
-                    else
-                        flag = true;
-                }
-
-                SwapBuffers(hDC);
-
-                cube_rotation_angle += cube_rotation_speed;
-                Sleep(static_cast<DWORD>(tick_speed));
+                visual.draw_cube(rotation_manager);
             }
+            glPopMatrix();
+
+            if (is_rotated && !isPaused)
+            {
+                if (solve_iteration < algo.log().size()) rotation_manager.rotate(algo.log()[solve_iteration]);
+                ++solve_iteration;
+                if (solve_iteration < algo.log().size())
+                    cmd = algo.log()[solve_iteration];
+                else
+                    is_solved = true;
+            }
+
+            SwapBuffers(hDC);
+
+            cube_rotation_angle += cube_rotation_speed;
+            Sleep(static_cast<DWORD>(tick_speed));
         }
     }
-
     /* shutdown OpenGL */
     DisableOpenGL(hwnd, hDC, hRC);
 
