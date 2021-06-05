@@ -9,6 +9,39 @@
 
 float near_val, far_val;
 
+std::vector<std::string> Randomize()
+{
+    std::vector<std::string> tmp;
+    int n = std::rand() % 17 + 4;
+    for (int i = 0; i < n; ++i)
+    {
+        int k = std::rand() % 6;
+        switch (k)
+        {
+            case 1:
+                tmp.emplace_back("U");
+                break;
+            case 2:
+                tmp.emplace_back("D");
+                break;
+            case 3:
+                tmp.emplace_back("R");
+                break;
+            case 4:
+                tmp.emplace_back("L");
+                break;
+            case 5:
+                tmp.emplace_back("F");
+                break;
+            case 6:
+                tmp.emplace_back("B");
+                break;
+        }
+    }
+
+    return tmp;
+}
+
 void ShowWorld()
 {
     float tile[] = {0,0,0, 0,1,0, 1,1,0, 1,0,0};
@@ -40,12 +73,6 @@ bool tick_time(float tick_time)
     return !(count_of_ticks % static_cast<int>(0.2 / tick_time + 1));
 }
 
-bool pause()
-{
-    bool f = GetKeyState('P') < 0;
-    std::cout << f;
-}
-
 LRESULT CALLBACK WindowProc(HWND, UINT, WPARAM, LPARAM);
 void EnableOpenGL(HWND hwnd, HDC*, HGLRC*);
 void DisableOpenGL(HWND, HDC, HGLRC);
@@ -55,6 +82,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
                    LPSTR lpCmdLine,
                    int nCmdShow)
 {
+    Randomize();
     visualizer visual;
     bool textures_are_used = false;
     parser prs("../config/config.cfg");
@@ -74,6 +102,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     prs.read_param(visual.green_texture, "green_texture");
     prs.read_param(visual.orange_texture, "orange_texture");
     prs.read_param(visual.yellow_texture, "yellow_texture");
+    //std::cout << textures_are_used;
 
     WNDCLASSEX wcex;
     HWND hwnd;
@@ -133,20 +162,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     cube_for_solution.generate_cube();
     cube_for_rotation.generate_cube();
-    //tmp.generate_cube();
-
-    //input_methods::generate_cube_from_file("../input.txt", tmp);
-    //input_methods::generate_cube_from_file("../input.txt", cb);
-
-    //lay_manager tmp_manager(&tmp);
-
 
     unsigned int wt, yt, rt, ot, gt, bt;
     visual.texture_initialization(wt, yt, rt, ot, gt, bt);
-    //cb.generate_texture(wt, yt, rt, ot, gt, bt);
+    cube_for_rotation.generate_texture(wt, yt, rt, ot, gt, bt);
 
     float hight = 4;
-    //std::string cmd = algo.log()[0];
 
     camera cam(0,0,1.7, 0,0);
     player gamer(cam);
@@ -155,7 +176,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
     bool is_solved = false, is_rotated = false;
     bool isPaused = true;
     int solve_iteration = 0;
-    //formatting(algo.log());
 
     std::string cmd;
     float edge_size = visual.block_size * static_cast<float>(visual.cube_size);
@@ -215,6 +235,23 @@ int WINAPI WinMain(HINSTANCE hInstance,
                     }
                 }
 
+                if (GetKeyState('7') < 0)
+                {
+                    auto tmp = Randomize();
+                    for (auto& it : tmp)
+                    {
+                        rotation_manager.rotate(it);
+                    }
+                    solution_manager.get_cube() = rotation_manager.get_cube();
+                    solve_iteration = 0;
+                    is_rotated = false;
+                    is_solved = false;
+                    algo.log().clear();
+                    input_methods::check_for_correctness(algo);
+                    formatting(algo.log());
+                    cmd = !algo.log().empty() ? algo.log()[0] : "";
+                }
+
                 if (GetKeyState('1') < 0 || GetKeyState('2') < 0 || GetKeyState('3') < 0
                 ||  GetKeyState('4') < 0 || GetKeyState('5') < 0 || GetKeyState('6') < 0)
                 {
@@ -267,16 +304,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
                         is_rotated = false;
                         is_solved = false;
                         algo.log().clear();
-                        if (!input_methods::check_for_correctness(algo))
-                        {
-                            std::cout << "The Rubick's cube can't be solved from this position";
-                            return 1;
-                        }
-                        else
-                        {
-                            formatting(algo.log());
-                            cmd = !algo.log().empty() ? algo.log()[0] : "";
-                        }
+                        input_methods::check_for_correctness(algo);
+                        formatting(algo.log());
+                        cmd = !algo.log().empty() ? algo.log()[0] : "";
                     }
                 }
             }
@@ -293,16 +323,16 @@ int WINAPI WinMain(HINSTANCE hInstance,
                 if (is_solved)
                 {
                     is_rotated = false;
-                    visual.draw_cube(rotation_manager);
+                    visual.draw_cube(rotation_manager, textures_are_used);
                 }
                 else
                 {
-                    is_rotated = visual.rotate_visualization(rotation_manager, cmd);
+                    is_rotated = visual.rotate_visualization(rotation_manager, cmd, textures_are_used);
                 }
             }
             else
             {
-                visual.draw_cube(rotation_manager);
+                visual.draw_cube(rotation_manager, textures_are_used);
             }
             glPopMatrix();
 

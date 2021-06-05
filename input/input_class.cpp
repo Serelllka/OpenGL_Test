@@ -180,3 +180,8 @@ void input_methods::output_to_console(cube & tmp)
         }
     }
 }
+
+void generate_cube_for_rotation(lay_manager&)
+{
+
+}

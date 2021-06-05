@@ -9,13 +9,13 @@ public:
 
     static void set_color(int8_t color);
 
-    void draw_block(block &, float, float, float) const;
+    void draw_block(block &, float, float, float, bool = false) const;
 
     void draw_blocks_grid(block &, float, float, float) const;
 
-    bool rotate_visualization(lay_manager &, const std::string&) const;
+    bool rotate_visualization(lay_manager &, const std::string&, bool = false) const;
 
-    void draw_cube(lay_manager &) const;
+    void draw_cube(lay_manager &, bool = false) const;
 
     void texture_initialization(unsigned int &, unsigned int &, unsigned int &, unsigned int &, unsigned int &,
                                 unsigned int &) const;

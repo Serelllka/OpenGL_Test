@@ -17,9 +17,9 @@ void algorithm::makeRotation(std::string cmd)
             ++i;
         }
         ++i;
-        //std::cout << str << ' ';
         manager_.rotate(str);
         solution_log_.push_back(str);
+        //std::cout << str << ' ';
     }
 }
 
@@ -39,13 +39,6 @@ void algorithm::to_bottom_position(block blk)
     else if(blk[BCK] != BLACK)  makeRotation("B L' D' L");
     else if(blk[LFT] != BLACK)  makeRotation("L F' D' F");
     else if(blk[RGT] != BLACK)  makeRotation("R B' D' B");
-
-    /*
-    else if(blk[FRT] != BLACK)  makeRotation("B L U B' U' L'");
-    else if(blk[BCK] != BLACK)  makeRotation("F R U F' U' R'");
-    else if(blk[LFT] != BLACK)  makeRotation("L F U L' U' F'");
-    else if(blk[RGT] != BLACK)  makeRotation("R B U R' U' B'");
-    */
 }
 
 void algorithm::first_stage()
@@ -64,19 +57,12 @@ void algorithm::first_stage()
                         ||  hasColors(manager_[i][j][k], WHITE, WHITE, BLUE))
                         && (!isInUpperCross(manager_[i][j][k])))
                     {
-                        //std::cout << i << ' ' << j << ' ' << k << std::endl;
                         to_bottom_position(manager_[i][j][k]);
-                        //std::cout << "\n";
                         to_upper_position(manager_[i][j][k]);
-                        //std::cout << "\n";
                     }
                 }
             }
         }
-}
-
-lay_manager &algorithm::manager() {
-    return manager_;
 }
 
 void algorithm::to_upper_position(block& blka)
@@ -290,14 +276,16 @@ void algorithm::third_stage()
 
     for (int p = 0; p < 4; ++p)
     {
-        int k = 0;
+        int k = 0, count = 0;
         while (!((manager_[0][1][0][BCK] == BLUE && manager_[0][1][0][DWN] != YELLOW)
                  || (manager_[1][0][0][LFT] == ORANGE && manager_[1][0][0][DWN] != YELLOW)
                  || (manager_[2][1][0][FRT] == GREEN && manager_[2][1][0][DWN] != YELLOW)
-                 || (manager_[1][2][0][RGT] == RGT && manager_[1][2][0][DWN] != YELLOW))) {
+                 || (manager_[1][2][0][RGT] == RGT && manager_[1][2][0][DWN] != YELLOW)))
+        {
             makeRotation("D");
             ++k;
             if (k == 4 && !toBottom(manager_)) {return;}
+            if (++count > 500) return;
         }
         if (manager_[1][0][0][LFT] == ORANGE) {
             if (manager_[1][0][0][DWN] == GREEN) {
@@ -446,9 +434,11 @@ void algorithm::fifth_stage()
 {
     std::vector<std::string> right_back = {"F", "D", "F'", "D", "F", "D", "D", "F'", "D"};
     std::vector<std::string> back_left  = {"R", "D", "R'", "D", "R", "D", "D", "R'", "D"};
+    int count = 0;
     while (manager_[2][1][0][FRT] != GREEN)
     {
         makeRotation("D");
+        if (++count > 500) return;
     }
     if (manager_[1][2][0][RGT] != RED)
     {
@@ -495,12 +485,14 @@ void algorithm::seventh_stage()
         std::vector<std::string> right_front = {"B'", "U'", "B", "U"};
         for (int i = 0; i < 4; ++i)
         {
+            int count = 0;
             while (manager_[0][0][0][DWN] != YELLOW)
             {
                 for (auto& it : right_front)
                 {
                     makeRotation(it);
                 }
+                if (++count > 500) return;
             }
             makeRotation("D'");
         }

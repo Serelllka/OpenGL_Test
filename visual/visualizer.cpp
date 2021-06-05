@@ -81,16 +81,16 @@ void visualizer::draw_blocks_grid(block& blk, float x, float y, float z) const
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void visualizer::draw_cube(lay_manager& manager) const
+void visualizer::draw_cube(lay_manager& manager, bool is_textured) const
 {
     for (int i = 0; i < manager.size(); ++i)
         for (int j = 0; j < manager.size(); ++j)
             for (int k = 0; k < manager.size(); ++k)
                 draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
-                           static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
+                           static_cast<float>(j) * block_size, static_cast<float>(k) * block_size, is_textured);
 }
 
-void visualizer::draw_block(block& blk, float x, float y, float z) const
+void visualizer::draw_block(block& blk, float x, float y, float z, bool is_textured) const
 {
     float upp[]     = {0,0,1, 1,0,1, 1,1,1, 0,1,1, //UPP
                        0,0,0, 1,0,0, 1,1,0, 0,1,0, //DOWN
@@ -132,9 +132,9 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
             coords[i] = blk.texture_positions[rc_types::UPP][i];
 
             set_color(blk[rc_types::UPP]);
-            //set_color(rc_types::WHITE);
+            if(is_textured) set_color(rc_types::WHITE);
 
-            glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::UPP]);
+            if(is_textured) glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::UPP]);
             glTexCoordPointer(2, GL_FLOAT, 0, coords);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
@@ -150,9 +150,9 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
             coords[i] = blk.texture_positions[rc_types::DWN][i - 8];
 
         set_color(blk[rc_types::DWN]);
-        //set_color(rc_types::WHITE);
+        if(is_textured) set_color(rc_types::WHITE);
 
-        glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::DWN]);
+        if(is_textured) glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::DWN]);
         glTexCoordPointer(2, GL_FLOAT, 0, coords);
         glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
     }
@@ -168,9 +168,9 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
             coords[i] = blk.texture_positions[rc_types::RGT][i - 16];
 
             set_color(blk[rc_types::RGT]);
-            //set_color(rc_types::WHITE);
+            if(is_textured) set_color(rc_types::WHITE);
 
-            glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::RGT]);
+            if(is_textured) glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::RGT]);
             glTexCoordPointer(2, GL_FLOAT, 0, coords);
             glDrawArrays(GL_TRIANGLE_FAN, 8, 4);
     }
@@ -186,9 +186,9 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
             coords[i] = blk.texture_positions[rc_types::LFT][i - 24];
 
         set_color(blk[rc_types::LFT]);
-        //set_color(rc_types::WHITE);
+        if(is_textured) set_color(rc_types::WHITE);
 
-        glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::LFT]);
+        if(is_textured) glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::LFT]);
         glTexCoordPointer(2, GL_FLOAT, 0, coords);
         glDrawArrays(GL_TRIANGLE_FAN, 12, 4);
     }
@@ -204,9 +204,9 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
             coords[i] = blk.texture_positions[rc_types::FRT][i - 32];
 
         set_color(blk[rc_types::FRT]);
-        //set_color(rc_types::WHITE);
+        if(is_textured) set_color(rc_types::WHITE);
 
-        glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::FRT]);
+        if(is_textured) glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::FRT]);
         glTexCoordPointer(2, GL_FLOAT, 0, coords);
         glDrawArrays(GL_TRIANGLE_FAN, 16, 4);
     }
@@ -222,9 +222,9 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
             coords[i] = blk.texture_positions[rc_types::BCK][i - 40];
 
         set_color(blk[rc_types::BCK]);
-        //set_color(rc_types::WHITE);
+        if(is_textured) set_color(rc_types::WHITE);
 
-        glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::BCK]);
+        if(is_textured) glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::BCK]);
         glTexCoordPointer(2, GL_FLOAT, 0, coords);
         glDrawArrays(GL_TRIANGLE_FAN, 20, 4);
     }
@@ -233,7 +233,7 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
 
     glPopMatrix();
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+    if(is_textured) glBindTexture(GL_TEXTURE_2D, 0);
     glDisableClientState(GL_VERTEX_ARRAY);
     draw_blocks_grid(blk, x, y, z);
 
@@ -244,7 +244,7 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
     }
 }
 
-bool visualizer::rotate_visualization(lay_manager& manager, const std::string& cmd) const
+bool visualizer::rotate_visualization(lay_manager& manager, const std::string& cmd, bool is_textured) const
 {
     float edge_size = block_size * static_cast<float>(cube_size);
     static float theta = 1;
@@ -256,7 +256,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
             for (int j = 0; j < 3; ++j)
                 for (int k = 0; k < 2; ++k)
                     draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
-                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
+                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size, is_textured);
 
         if (cmd == "U") ratio = -1;
         if (cmd == "U2") bruh = 2;
@@ -266,7 +266,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
                 draw_block(manager[i][j][2], static_cast<float>(i) * block_size,
-                           static_cast<float>(j) * block_size, 2 * block_size);
+                           static_cast<float>(j) * block_size, 2 * block_size, is_textured);
     }
     else if (cmd == "D" || cmd == "D'" || cmd == "D2")
     {
@@ -274,7 +274,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
             for (int j = 0; j < 3; ++j)
                 for (int k = 1; k < 3; ++k)
                     draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
-                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
+                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size, is_textured);
 
         if (cmd == "D'") ratio = -1;
         if (cmd == "D2") bruh = 2;
@@ -284,7 +284,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
                 draw_block(manager[i][j][0], static_cast<float>(i) * block_size,
-                           static_cast<float>(j) * block_size, 0);
+                           static_cast<float>(j) * block_size, 0, is_textured);
     }
     else if (cmd == "F" || cmd == "F'" || cmd == "F2")
     {
@@ -292,7 +292,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
             for (int j = 0; j < 3; ++j)
                 for (int k = 0; k < 3; ++k)
                     draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
-                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
+                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size, is_textured);
 
         if (cmd == "F") ratio = -1;
         if (cmd == "F2") bruh = 2;
@@ -302,7 +302,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
                 draw_block(manager[2][i][j], 2 * block_size, static_cast<float>(i) * block_size,
-                           static_cast<float>(j) * block_size);
+                           static_cast<float>(j) * block_size, is_textured);
     }
     else if (cmd == "B" || cmd == "B'" || cmd == "B2")
     {
@@ -310,7 +310,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
             for (int j = 0; j < 3; ++j)
                 for (int k = 0; k < 3; ++k)
                     draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
-                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
+                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size, is_textured);
 
         if (cmd == "B'") ratio = -1;
         if (cmd == "B2") bruh = 2;
@@ -320,7 +320,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
                 draw_block(manager[0][i][j], 0, static_cast<float>(i) * block_size,
-                           static_cast<float>(j) * block_size);
+                           static_cast<float>(j) * block_size, is_textured);
     }
     else if (cmd == "R" || cmd == "R'" || cmd == "R2")
     {
@@ -328,7 +328,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
             for (int j = 0; j < 2; ++j)
                 for (int k = 0; k < 3; ++k)
                     draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
-                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
+                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size, is_textured);
 
         if (cmd == "R") ratio = -1;
         if (cmd == "R2") bruh = 2;
@@ -338,7 +338,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
                 draw_block(manager[i][2][j], static_cast<float>(i) * block_size,
-                           2 * block_size, static_cast<float>(j) * block_size);
+                           2 * block_size, static_cast<float>(j) * block_size, is_textured);
     }
     else if (cmd == "L" || cmd == "L'" || cmd == "L2")
     {
@@ -346,7 +346,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
             for (int j = 1; j < 3; ++j)
                 for (int k = 0; k < 3; ++k)
                     draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
-                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
+                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size, is_textured);
 
         if (cmd == "L'") ratio = -1;
         if (cmd == "L2") bruh = 2;
@@ -356,7 +356,7 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
                 draw_block(manager[i][0][j], static_cast<float>(i) * block_size,
-                           0, static_cast<float>(j) * block_size);
+                           0, static_cast<float>(j) * block_size, is_textured);
     }
     glPopMatrix();
 
