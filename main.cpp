@@ -34,10 +34,10 @@ void ShowWorld()
 bool tick_time(float tick_time)
 {
     static int count_of_ticks = 0;
-    count_of_ticks %= static_cast<int>(0.2 / tick_time);
+    count_of_ticks %= static_cast<int>(0.2 / tick_time + 1);
     count_of_ticks++;
     //std::cout << count_of_ticks;
-    return !(count_of_ticks % static_cast<int>(0.2 / tick_time));
+    return !(count_of_ticks % static_cast<int>(0.2 / tick_time + 1));
 }
 
 bool pause()
@@ -200,7 +200,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
                     input_methods::generate_cube_from_file("../input.txt", cube_for_solution);
                     input_methods::generate_cube_from_file("../input.txt", cube_for_rotation);
                     solve_iteration = 0;
-                    is_rotated = false;
+                    //is_rotated = false;
                     is_solved = false;
                     algo.log().clear();
                     if (!input_methods::check_for_correctness(algo))
@@ -215,42 +215,70 @@ int WINAPI WinMain(HINSTANCE hInstance,
                     }
                 }
 
-                if ((GetKeyState('1') < 0) && isPaused)
-                    if(tick_time(tick_speed))
+                if (GetKeyState('1') < 0 || GetKeyState('2') < 0 || GetKeyState('3') < 0
+                ||  GetKeyState('4') < 0 || GetKeyState('5') < 0 || GetKeyState('6') < 0)
+                {
+                    bool is_rotated_time = false;
+                    if ((GetKeyState('1') < 0) && isPaused)
+                        if (tick_time(tick_speed))
+                        {
+                            is_rotated_time = true;
+                            rotation_manager.rotate("U");
+                            solution_manager.get_cube() = rotation_manager.get_cube();
+                        }
+                    if ((GetKeyState('2') < 0) && isPaused)
+                        if (tick_time(tick_speed))
+                        {
+                            is_rotated_time = true;
+                            rotation_manager.rotate("D");
+                            solution_manager.get_cube() = rotation_manager.get_cube();
+                        }
+                    if ((GetKeyState('3') < 0) && isPaused)
+                        if (tick_time(tick_speed))
+                        {
+                            is_rotated_time = true;
+                            rotation_manager.rotate("R");
+                            solution_manager.get_cube() = rotation_manager.get_cube();
+                        }
+                    if ((GetKeyState('4') < 0) && isPaused)
+                        if (tick_time(tick_speed))
+                        {
+                            is_rotated_time = true;
+                            rotation_manager.rotate("L");
+                            solution_manager.get_cube() = rotation_manager.get_cube();
+                        }
+                    if ((GetKeyState('5') < 0) && isPaused)
+                        if (tick_time(tick_speed))
+                        {
+                            is_rotated_time = true;
+                            rotation_manager.rotate("F");
+                            solution_manager.get_cube() = rotation_manager.get_cube();
+                        }
+                    if ((GetKeyState('6') < 0) && isPaused)
+                        if (tick_time(tick_speed))
+                        {
+                            is_rotated_time = true;
+                            rotation_manager.rotate("B");
+                            solution_manager.get_cube() = rotation_manager.get_cube();
+                        }
+                    if (is_rotated_time)
                     {
-                        rotation_manager.rotate("U");
-                        solution_manager.rotate("U");
+                        solve_iteration = 0;
+                        is_rotated = false;
+                        is_solved = false;
+                        algo.log().clear();
+                        if (!input_methods::check_for_correctness(algo))
+                        {
+                            std::cout << "The Rubick's cube can't be solved from this position";
+                            return 1;
+                        }
+                        else
+                        {
+                            formatting(algo.log());
+                            cmd = !algo.log().empty() ? algo.log()[0] : "";
+                        }
                     }
-                if ((GetKeyState('2') < 0) && isPaused)
-                    if(tick_time(tick_speed))
-                    {
-                        rotation_manager.rotate("D");
-                        solution_manager.rotate("D");
-                    }
-                if ((GetKeyState('3') < 0) && isPaused)
-                    if(tick_time(tick_speed))
-                    {
-                        rotation_manager.rotate("R");
-                        solution_manager.rotate("R");
-                    }
-                if ((GetKeyState('4') < 0) && isPaused)
-                    if(tick_time(tick_speed))
-                    {
-                        rotation_manager.rotate("L");
-                        solution_manager.rotate("L");
-                    }
-                if ((GetKeyState('5') < 0) && isPaused)
-                    if(tick_time(tick_speed))
-                    {
-                        rotation_manager.rotate("F");
-                        solution_manager.rotate("F");
-                    }
-                if ((GetKeyState('6') < 0) && isPaused)
-                    if(tick_time(tick_speed))
-                    {
-                        rotation_manager.rotate("B");
-                        solution_manager.rotate("B");
-                    }
+                }
             }
 
             gamer.get_camera().apply();
