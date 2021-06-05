@@ -5,7 +5,7 @@
 
 class visualizer {
 public:
-    void draw_line(float, float, float, float, float, float);
+    static void draw_line(float, float, float, float, float, float);
 
     static void set_color(int8_t color);
 
@@ -15,7 +15,7 @@ public:
 
     bool rotate_visualization(lay_manager &, const std::string&) const;
 
-    void draw_cube(lay_manager &);
+    void draw_cube(lay_manager &) const;
 
     void texture_initialization(unsigned int &, unsigned int &, unsigned int &, unsigned int &, unsigned int &,
                                 unsigned int &) const;

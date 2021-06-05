@@ -81,12 +81,13 @@ void visualizer::draw_blocks_grid(block& blk, float x, float y, float z) const
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void visualizer::draw_cube(lay_manager& manager)
+void visualizer::draw_cube(lay_manager& manager) const
 {
     for (int i = 0; i < manager.size(); ++i)
         for (int j = 0; j < manager.size(); ++j)
             for (int k = 0; k < manager.size(); ++k)
-                draw_block(manager[i][j][k], i * block_size, j * block_size, k * block_size);
+                draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
+                           static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
 }
 
 void visualizer::draw_block(block& blk, float x, float y, float z) const
@@ -130,8 +131,8 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
         for (int i = 0; i < 8; ++i)
             coords[i] = blk.texture_positions[rc_types::UPP][i];
 
-            //set_color(blk[rc_types::UPP]);
-            set_color(rc_types::WHITE);
+            set_color(blk[rc_types::UPP]);
+            //set_color(rc_types::WHITE);
 
             glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::UPP]);
             glTexCoordPointer(2, GL_FLOAT, 0, coords);
@@ -148,8 +149,8 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
         for (int i = 8; i < 16; ++i)
             coords[i] = blk.texture_positions[rc_types::DWN][i - 8];
 
-        //set_color(blk[rc_types::DWN]);
-        set_color(rc_types::WHITE);
+        set_color(blk[rc_types::DWN]);
+        //set_color(rc_types::WHITE);
 
         glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::DWN]);
         glTexCoordPointer(2, GL_FLOAT, 0, coords);
@@ -166,8 +167,8 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
         for (int i = 16; i < 24; ++i)
             coords[i] = blk.texture_positions[rc_types::RGT][i - 16];
 
-            //set_color(blk[rc_types::RGT]);
-            set_color(rc_types::WHITE);
+            set_color(blk[rc_types::RGT]);
+            //set_color(rc_types::WHITE);
 
             glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::RGT]);
             glTexCoordPointer(2, GL_FLOAT, 0, coords);
@@ -184,8 +185,8 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
         for (int i = 24; i < 32; ++i)
             coords[i] = blk.texture_positions[rc_types::LFT][i - 24];
 
-        //set_color(blk[rc_types::LFT]);
-        set_color(rc_types::WHITE);
+        set_color(blk[rc_types::LFT]);
+        //set_color(rc_types::WHITE);
 
         glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::LFT]);
         glTexCoordPointer(2, GL_FLOAT, 0, coords);
@@ -202,8 +203,8 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
         for (int i = 32; i < 40; ++i)
             coords[i] = blk.texture_positions[rc_types::FRT][i - 32];
 
-        //set_color(blk[rc_types::FRT]);
-        set_color(rc_types::WHITE);
+        set_color(blk[rc_types::FRT]);
+        //set_color(rc_types::WHITE);
 
         glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::FRT]);
         glTexCoordPointer(2, GL_FLOAT, 0, coords);
@@ -220,8 +221,8 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
         for (int i = 40; i < 48; ++i)
             coords[i] = blk.texture_positions[rc_types::BCK][i - 40];
 
-        //set_color(blk[rc_types::BCK]);
-        set_color(rc_types::WHITE);
+        set_color(blk[rc_types::BCK]);
+        //set_color(rc_types::WHITE);
 
         glBindTexture(GL_TEXTURE_2D, blk.texture_types[rc_types::BCK]);
         glTexCoordPointer(2, GL_FLOAT, 0, coords);
@@ -245,7 +246,7 @@ void visualizer::draw_block(block& blk, float x, float y, float z) const
 
 bool visualizer::rotate_visualization(lay_manager& manager, const std::string& cmd) const
 {
-    float edge_size = block_size * cube_size;
+    float edge_size = block_size * static_cast<float>(cube_size);
     static float theta = 1;
     glPushMatrix();
     int ratio = 1, bruh = 1;
@@ -254,96 +255,108 @@ bool visualizer::rotate_visualization(lay_manager& manager, const std::string& c
         for(int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
                 for (int k = 0; k < 2; ++k)
-                    draw_block(manager[i][j][k], i * block_size, j * block_size, k * block_size);
+                    draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
+                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
 
         if (cmd == "U") ratio = -1;
         if (cmd == "U2") bruh = 2;
         glTranslatef(edge_size/2, edge_size/2, 0);
-        glRotatef(ratio * theta * bruh, 0, 0, 1);
+        glRotatef(static_cast<float>(ratio) * theta * static_cast<float>(bruh), 0, 0, 1);
         glTranslatef(-edge_size/2, -edge_size/2, 0);
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
-                draw_block(manager[i][j][2], i * block_size, j * block_size, 2 * block_size);
+                draw_block(manager[i][j][2], static_cast<float>(i) * block_size,
+                           static_cast<float>(j) * block_size, 2 * block_size);
     }
     else if (cmd == "D" || cmd == "D'" || cmd == "D2")
     {
         for(int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
                 for (int k = 1; k < 3; ++k)
-                    draw_block(manager[i][j][k], i * block_size, j * block_size, k * block_size);
+                    draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
+                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
 
         if (cmd == "D'") ratio = -1;
         if (cmd == "D2") bruh = 2;
         glTranslatef(edge_size/2, edge_size/2, 0);
-        glRotatef(ratio * theta * bruh, 0, 0, 1);
+        glRotatef(static_cast<float>(ratio) * theta * static_cast<float>(bruh), 0, 0, 1);
         glTranslatef(-edge_size/2, -edge_size/2, 0);
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
-                draw_block(manager[i][j][0], i * block_size, j * block_size, 0);
+                draw_block(manager[i][j][0], static_cast<float>(i) * block_size,
+                           static_cast<float>(j) * block_size, 0);
     }
     else if (cmd == "F" || cmd == "F'" || cmd == "F2")
     {
         for(int i = 0; i < 2; ++i)
             for (int j = 0; j < 3; ++j)
                 for (int k = 0; k < 3; ++k)
-                    draw_block(manager[i][j][k], i * block_size, j * block_size, k * block_size);
+                    draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
+                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
 
         if (cmd == "F") ratio = -1;
         if (cmd == "F2") bruh = 2;
         glTranslatef(0, edge_size/2, edge_size/2);
-        glRotatef(ratio * theta * bruh, 1, 0, 0);
+        glRotatef(static_cast<float>(ratio) * theta * static_cast<float>(bruh), 1, 0, 0);
         glTranslatef(0, -edge_size/2, -edge_size/2);
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
-                draw_block(manager[2][i][j], 2 * block_size, i * block_size, j * block_size);
+                draw_block(manager[2][i][j], 2 * block_size, static_cast<float>(i) * block_size,
+                           static_cast<float>(j) * block_size);
     }
     else if (cmd == "B" || cmd == "B'" || cmd == "B2")
     {
         for(int i = 1; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
                 for (int k = 0; k < 3; ++k)
-                    draw_block(manager[i][j][k], i * block_size, j * block_size, k * block_size);
+                    draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
+                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
 
         if (cmd == "B'") ratio = -1;
         if (cmd == "B2") bruh = 2;
         glTranslatef(0, edge_size/2, edge_size/2);
-        glRotatef(ratio * theta * bruh, 1, 0, 0);
+        glRotatef(static_cast<float>(ratio) * theta * static_cast<float>(bruh), 1, 0, 0);
         glTranslatef(0, -edge_size/2, -edge_size/2);
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
-                draw_block(manager[0][i][j], 0, i * block_size, j * block_size);
+                draw_block(manager[0][i][j], 0, static_cast<float>(i) * block_size,
+                           static_cast<float>(j) * block_size);
     }
     else if (cmd == "R" || cmd == "R'" || cmd == "R2")
     {
         for(int i = 0; i < 3; ++i)
             for (int j = 0; j < 2; ++j)
                 for (int k = 0; k < 3; ++k)
-                    draw_block(manager[i][j][k], i * block_size, j * block_size, k * block_size);
+                    draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
+                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
 
         if (cmd == "R") ratio = -1;
         if (cmd == "R2") bruh = 2;
         glTranslatef(edge_size/2, 0, edge_size/2);
-        glRotatef(ratio * theta * bruh, 0, 1, 0);
+        glRotatef(static_cast<float>(ratio) * theta * static_cast<float>(bruh), 0, 1, 0);
         glTranslatef(-edge_size/2, 0, -edge_size/2);
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
-                draw_block(manager[i][2][j], i * block_size, 2 * block_size, j * block_size);
+                draw_block(manager[i][2][j], static_cast<float>(i) * block_size,
+                           2 * block_size, static_cast<float>(j) * block_size);
     }
     else if (cmd == "L" || cmd == "L'" || cmd == "L2")
     {
         for(int i = 0; i < 3; ++i)
             for (int j = 1; j < 3; ++j)
                 for (int k = 0; k < 3; ++k)
-                    draw_block(manager[i][j][k], i * block_size, j * block_size, k * block_size);
+                    draw_block(manager[i][j][k], static_cast<float>(i) * block_size,
+                               static_cast<float>(j) * block_size, static_cast<float>(k) * block_size);
 
         if (cmd == "L'") ratio = -1;
         if (cmd == "L2") bruh = 2;
         glTranslatef(edge_size/2, 0, edge_size/2);
-        glRotatef(ratio * theta * bruh, 0, 1, 0);
+        glRotatef(static_cast<float>(ratio) * theta * static_cast<float>(bruh), 0, 1, 0);
         glTranslatef(-edge_size/2, 0, -edge_size/2);
         for (int i = 0; i < 3; ++i)
             for (int j = 0; j < 3; ++j)
-                draw_block(manager[i][0][j], i * block_size, 0, j * block_size);
+                draw_block(manager[i][0][j], static_cast<float>(i) * block_size,
+                           0, static_cast<float>(j) * block_size);
     }
     glPopMatrix();
 

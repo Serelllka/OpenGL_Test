@@ -124,3 +124,59 @@ void input_methods::save_cube_to_file(const std::string& file_name, cube& tmp)
         }
     }
 }
+
+void input_methods::output_to_console(cube & tmp)
+{
+    for (int k = 0; k < 6; ++k)
+    {
+        switch (k)
+        {
+            case 0:
+                std::cout << "UPP:\n";
+                break;
+            case 1:
+                std::cout << "DWN:\n";
+                break;
+            case 2:
+                std::cout << "RGT:\n";
+                break;
+            case 3:
+                std::cout << "LFT:\n";
+                break;
+            case 4:
+                std::cout << "FRT:\n";
+                break;
+            case 5:
+                std::cout << "BCK:\n";
+                break;
+        }
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                switch (k)
+                {
+                    case 0:
+                        std::cout << color_to_liter(static_cast<colors>(tmp[i][j][2][rc_types::UPP]));
+                        break;
+                    case 1:
+                        std::cout << color_to_liter(static_cast<colors>(tmp[i][j][0][rc_types::DWN]));
+                        break;
+                    case 2:
+                        std::cout << color_to_liter(static_cast<colors>(tmp[i][2][j][rc_types::RGT]));
+                        break;
+                    case 3:
+                        std::cout << color_to_liter(static_cast<colors>(tmp[i][0][j][rc_types::LFT]));
+                        break;
+                    case 4:
+                        std::cout << color_to_liter(static_cast<colors>(tmp[2][i][j][rc_types::FRT]));
+                        break;
+                    case 5:
+                        std::cout << color_to_liter(static_cast<colors>(tmp[0][i][j][rc_types::BCK]));
+                        break;
+                }
+            }
+            std::cout << '\n';
+        }
+    }
+}

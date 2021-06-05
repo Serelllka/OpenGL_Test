@@ -1,8 +1,6 @@
 #include <windows.h>
-#include <gl/gl.h>
-#include <math.h>
+#include <cmath>
 #include <iostream>
-#include <algorithm>
 #include "visual/visualizer.h"
 #include "algorithm/algorithm.h"
 #include "visual/player.h"
@@ -25,13 +23,14 @@ void ShowWorld()
                 glPushMatrix();
                     if((i + j) % 2) glColor3f(0, 0.5, 0);
                     else glColor3f(1, 1, 1);
-                    glTranslatef(i, j, 0);
+                    glTranslatef(static_cast<float>(i), static_cast<float>(j), 0);
                     glVertexPointer(3, GL_FLOAT, 0, &tile);
                     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
                 glPopMatrix();
             }
         }
 }
+
 
 bool pause()
 {
@@ -49,6 +48,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
                    int nCmdShow)
 {
     visualizer visual;
+    bool textures_are_used = false;
     parser prs("../config/config.cfg");
     float tick_speed, cube_rotation_angle, cube_rotation_speed;
     prs.read_param(tick_speed, "tick_speed");
@@ -56,6 +56,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     prs.read_param(cube_rotation_speed, "cube_rotation_speed");
     prs.read_param(near_val, "near_value");
     prs.read_param(far_val, "far_value");
+    prs.read_param(textures_are_used, "textures_are_used");
     prs.read_param(visual.face_rotation_speed, "face_rotation_speed");
     prs.read_param(visual.block_size, "block_size");
     prs.read_param(visual.cube_size, "cube_size");
@@ -80,12 +81,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
     wcex.hInstance = hInstance;
-    wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-    wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wcex.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-    wcex.lpszMenuName = NULL;
+    wcex.lpszMenuName = nullptr;
     wcex.lpszClassName = "GLSample";
-    wcex.hIconSm = LoadIcon(NULL, IDI_APPLICATION);;
+    wcex.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);
 
 
     if (!RegisterClassEx(&wcex))
@@ -100,10 +101,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
                           CW_USEDEFAULT,
                           500,
                           500,
-                          NULL,
-                          NULL,
+                          nullptr,
+                          nullptr,
                           hInstance,
-                          NULL);
+                          nullptr);
 
     ShowWindow(hwnd, nCmdShow);
 
@@ -116,18 +117,22 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     glFrustum(-1,1, -1,1, near_val,far_val);
 
-    cube cb(3), tmp(3);
+    cube cb(3);
+    lay_manager manager(&cb);
+    algorithm algo(manager);
+    //cube tmp(3);
     cb.generate_cube();
-    tmp.generate_cube();
+    //tmp.generate_cube();
 
     //input_methods::generate_cube_from_file("../input.txt", tmp);
     //input_methods::generate_cube_from_file("../input.txt", cb);
-    lay_manager tmp_manager(&tmp), manager(&cb);
-    algorithm algo(tmp_manager);
+
+    //lay_manager tmp_manager(&tmp);
+
 
     unsigned int wt, yt, rt, ot, gt, bt;
     visual.texture_initialization(wt, yt, rt, ot, gt, bt);
-    cb.generate_texture(wt, yt, rt, ot, gt, bt);
+    //cb.generate_texture(wt, yt, rt, ot, gt, bt);
 
 
     //lay_manager manager(&cb);
@@ -139,14 +144,14 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
     float hight = 4;
     //std::string cmd = algo.log()[0];
-    int i = 0;
 
     camera cam(0,0,1.7, 0,0);
     player gamer(cam);
 
     /* program main loop */
     bool flag = false, f = false;
-    bool isPaused = false;
+    bool isPaused = true;
+    int solve_iteration = 0;
     if (!input_methods::check_for_correctness(algo))
     {
         std::cout << "The Rubick's cube can't be solved from this position";
@@ -154,12 +159,13 @@ int WINAPI WinMain(HINSTANCE hInstance,
     else
     {
         formatting(algo.log());
-        std::string cmd = algo.log().size() ? algo.log()[0] : "";
-        float edge_size = visual.block_size * visual.cube_size;
+        std::string cmd = !algo.log().empty() ? algo.log()[0] : "";
+        float edge_size = visual.block_size * static_cast<float>(visual.cube_size);
         while (!bQuit)
         {
             /* check for messages */
-            if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+            if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+            {
                 /* handle or dispatch messages */
                 if (msg.message == WM_QUIT) {
                     bQuit = TRUE;
@@ -167,7 +173,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
                     TranslateMessage(&msg);
                     DispatchMessage(&msg);
                 }
-            } else
+            }
+            else
             {
                 /* OpenGL animation code goes here */
 
@@ -184,7 +191,16 @@ int WINAPI WinMain(HINSTANCE hInstance,
                         isPaused = false;
                     if (GetKeyState('Z') < 0)
                         input_methods::save_cube_to_file("../output.txt", manager.get_cube());
+                    if (GetKeyState('O') < 0)
+                        input_methods::output_to_console(manager.get_cube());
+
+                    if (GetKeyState('L') && isPaused)
+                    {
+                        input_methods::generate_cube_from_file("../input.txt", cb);
+                        solve_iteration = 0;
+                    }
                 }
+
                 gamer.get_camera().apply();
                 ShowWorld();
 
@@ -213,10 +229,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
                 if (f && !isPaused)
                 {
-                    if (i < algo.log().size()) manager.rotate(algo.log()[i]);
-                    ++i;
-                    if (i < algo.log().size())
-                        cmd = algo.log()[i];
+                    if (solve_iteration < algo.log().size()) manager.rotate(algo.log()[solve_iteration]);
+                    ++solve_iteration;
+                    if (solve_iteration < algo.log().size())
+                        cmd = algo.log()[solve_iteration];
                     else
                         flag = true;
                 }
@@ -224,7 +240,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
                 SwapBuffers(hDC);
 
                 cube_rotation_angle += cube_rotation_speed;
-                Sleep(tick_speed);
+                Sleep(static_cast<DWORD>(tick_speed));
             }
         }
     }
@@ -235,7 +251,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     /* destroy the window explicitly */
     DestroyWindow(hwnd);
 
-    return msg.wParam;
+    return static_cast<int>(msg.wParam);
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -308,7 +324,7 @@ void EnableOpenGL(HWND hwnd, HDC* hDC, HGLRC* hRC)
 
 void DisableOpenGL (HWND hwnd, HDC hDC, HGLRC hRC)
 {
-    wglMakeCurrent(NULL, NULL);
+    wglMakeCurrent(nullptr, nullptr);
     wglDeleteContext(hRC);
     ReleaseDC(hwnd, hDC);
 }
